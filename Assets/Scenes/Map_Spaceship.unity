@@ -301,7 +301,7 @@ GameObject:
   - component: {fileID: 77750884}
   - component: {fileID: 77750883}
   - component: {fileID: 77750882}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -330,7 +330,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77750880}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 828bf5108169db64083ebd74787fc42f, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -523,6 +523,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 212769577}
+  - component: {fileID: 212769578}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -545,6 +546,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 628609544}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &212769578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 212769576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 748faec2bda54104a898dcf93d73669f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  tanks:
+  - {fileID: 1197284850}
 --- !u!1 &524005905
 GameObject:
   m_ObjectHideFlags: 0
@@ -624,7 +639,7 @@ GameObject:
   - component: {fileID: 725583198}
   - component: {fileID: 725583197}
   - component: {fileID: 725583196}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -653,7 +668,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 725583194}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 828bf5108169db64083ebd74787fc42f, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -736,7 +751,7 @@ GameObject:
   - component: {fileID: 975198923}
   - component: {fileID: 975198922}
   - component: {fileID: 975198921}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -848,7 +863,7 @@ GameObject:
   - component: {fileID: 1022161244}
   - component: {fileID: 1022161243}
   - component: {fileID: 1022161242}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -877,7 +892,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1022161240}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 828bf5108169db64083ebd74787fc42f, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1087,7 +1102,7 @@ GameObject:
   - component: {fileID: 1110437493}
   - component: {fileID: 1110437492}
   - component: {fileID: 1110437491}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Turret
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1200,7 +1215,7 @@ GameObject:
   - component: {fileID: 1141304828}
   - component: {fileID: 1141304827}
   - component: {fileID: 1141304826}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1229,7 +1244,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141304824}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 828bf5108169db64083ebd74787fc42f, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1314,7 +1329,8 @@ GameObject:
   - component: {fileID: 1197284846}
   - component: {fileID: 1197284845}
   - component: {fileID: 1197284849}
-  m_Layer: 0
+  - component: {fileID: 1197284850}
+  m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1436,11 +1452,41 @@ MonoBehaviour:
   projectilePrefab: {fileID: 8030136784132672620, guid: dc73944edbee7ee49ab0989207d58047, type: 3}
   firePoint: {fileID: 1701236710}
   projectileParent: {fileID: 1745568251}
-  minSpeed: 8
-  maxSpeed: 20
+  turret: {fileID: 1110437490}
+  turretRenderer: {fileID: 1110437492}
+  barrelRenderer: {fileID: 1507063977}
+  minSpeed: 4
+  maxSpeed: 6
   maxChargeTime: 2
+  fireCoolTime: 1
+  overheatMaterials:
+  - {fileID: 2100000, guid: b18643c504675084f8056fa7c98a10f5, type: 2}
+  - {fileID: 2100000, guid: c2818acefc708de4189d40bc91899c45, type: 2}
+  - {fileID: 2100000, guid: 9ae40cd0021f6374cb97bf88acb35959, type: 2}
+  - {fileID: 2100000, guid: f8054cb59f9ff61498a59b25aa3c10ee, type: 2}
+  - {fileID: 2100000, guid: 0081d7825cd729d4085641c2107a69ef, type: 2}
   maxHeat: 100
-  heatCooldownRate: 15
+  heatCooldownRate: 4
+  _overheatRanges:
+  - 25
+  - 50
+  - 75
+  - 100
+--- !u!114 &1197284850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1197284843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a45beaf2d6ba2a24399087548e11530a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TankHealth
+  bodyRenderer: {fileID: 975198922}
+  damagedMaterial: {fileID: 2100000, guid: f8054cb59f9ff61498a59b25aa3c10ee, type: 2}
+  maxHp: 2
 --- !u!1 &1413848164
 GameObject:
   m_ObjectHideFlags: 0
@@ -1497,7 +1543,7 @@ GameObject:
   - component: {fileID: 1507063978}
   - component: {fileID: 1507063977}
   - component: {fileID: 1507063976}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Barrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1639,7 +1685,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1701236710}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1655,7 +1701,7 @@ Transform:
   m_GameObject: {fileID: 1701236709}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.5}
+  m_LocalPosition: {x: 0, y: 0, z: 1.09}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -62,11 +62,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Project\Scripts\Modules\IMovementInput.cs" />
+    <Compile Include="Assets\Project\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Projectile.cs" />
     <Compile Include="Assets\Project\Scripts\Modules\PoolManager.cs" />
     <Compile Include="Assets\Project\PlayerInputActions.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\TankController.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
+    <Compile Include="Assets\Project\Scripts\GamePlay\TankHealth.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\TankShooter.cs" />
     <Compile Include="Assets\Project\Scripts\Modules\KeyboardMovementInput.cs" />
   </ItemGroup>
