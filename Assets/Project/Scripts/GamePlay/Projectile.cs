@@ -8,9 +8,11 @@ public class Projectile : MonoBehaviour
 
     private float _speed;
     private Vector3 _lastVelocity;
+    private bool _isReturned = false;
 
     public void Init(GameObject prefabRef, Vector3 velocity)
     {
+        _isReturned = false;
         _prefabRef = prefabRef;
         _rb = GetComponent<Rigidbody>();
         _rb.linearVelocity = velocity;
@@ -26,10 +28,16 @@ public class Projectile : MonoBehaviour
     {
         GameObject hit = collision.gameObject;
 
-        if (hit.layer == LayerMask.NameToLayer("Wall") || hit.layer == LayerMask.NameToLayer("Projectile"))
+        if (hit.layer == LayerMask.NameToLayer("Wall"))
         {
             Reflect(collision.GetContact(0).normal);
-            Debug.DrawRay(collision.GetContact(0).point, collision.GetContact(0).normal, Color.red, 1.0f);
+            return;
+        }
+
+        if (hit.layer == LayerMask.NameToLayer("Projectile"))
+        {
+            hit.GetComponent<Projectile>()?.ReturnToPool();
+            ReturnToPool();
             return;
         }
 
@@ -37,6 +45,7 @@ public class Projectile : MonoBehaviour
         {
             hit.GetComponent<TankHealth>()?.TakeDamage(1);
             ReturnToPool();
+            return;
         }
     }
 
@@ -52,6 +61,8 @@ public class Projectile : MonoBehaviour
 
     public void ReturnToPool()
     {
+        if (_isReturned) return;
+        _isReturned = true;
         PoolManager.Instance.Release(_prefabRef, gameObject);
     }
 }

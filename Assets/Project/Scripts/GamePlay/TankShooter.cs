@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using BrmnModules.Pool;
-using System;
 
 public class TankShooter : MonoBehaviour
 {
@@ -12,6 +11,12 @@ public class TankShooter : MonoBehaviour
     [SerializeField] private Transform turret;
     [SerializeField] private Renderer turretRenderer;
     [SerializeField] private Renderer barrelRenderer;
+
+    [Header("MultiPlay Variables")]
+    [SerializeField] private bool isPlayer2 = false;
+    [SerializeField] private float turretRotateSpeed = 120f;
+    private bool _aimLeft;
+    private bool _aimRight;
 
     [Header("Projectile Varialbes")]
     [SerializeField] private float minSpeed = 4f;
@@ -55,16 +60,43 @@ public class TankShooter : MonoBehaviour
 
     private void OnEnable()
     {
-        _inputActions.Player.Fire.Enable();
-        _inputActions.Player.Fire.started += OnFireStarted;   // 누르는 순간
-        _inputActions.Player.Fire.canceled += OnFireCanceled;  // 떼는 순간
+        if (isPlayer2)
+        {
+            _inputActions.Player2.Fire.Enable();
+            _inputActions.Player2.Fire.started += OnFireStarted;
+            _inputActions.Player2.Fire.canceled += OnFireCanceled;
+
+            _inputActions.Player2.AimLeft.Enable();
+            _inputActions.Player2.AimRight.Enable();
+            _inputActions.Player2.AimLeft.performed += ctx => _aimLeft = true;
+            _inputActions.Player2.AimLeft.canceled += ctx => _aimLeft = false;
+            _inputActions.Player2.AimRight.performed += ctx => _aimRight = true;
+            _inputActions.Player2.AimRight.canceled += ctx => _aimRight = false;
+        }
+        else
+        {
+            _inputActions.Player.Fire.Enable();
+            _inputActions.Player.Fire.started += OnFireStarted;
+            _inputActions.Player.Fire.canceled += OnFireCanceled;
+        }
     }
 
     private void OnDisable()
     {
-        _inputActions.Player.Fire.started -= OnFireStarted;
-        _inputActions.Player.Fire.canceled -= OnFireCanceled;
-        _inputActions.Player.Fire.Disable();
+        if (isPlayer2)
+        {
+            _inputActions.Player2.Fire.started -= OnFireStarted;
+            _inputActions.Player2.Fire.canceled -= OnFireCanceled;
+            _inputActions.Player2.Fire.Disable();
+            _inputActions.Player2.AimLeft.Disable();
+            _inputActions.Player2.AimRight.Disable();
+        }
+        else
+        {
+            _inputActions.Player.Fire.started -= OnFireStarted;
+            _inputActions.Player.Fire.canceled -= OnFireCanceled;
+            _inputActions.Player.Fire.Disable();
+        }
     }
 
     private void Update()
@@ -86,6 +118,20 @@ public class TankShooter : MonoBehaviour
 
     private void HandleAim()
     {
+        if (isPlayer2)
+        {
+            // rotate with button
+            float rotDir = 0f;
+            if (_aimLeft) rotDir = -1f;
+            if (_aimRight) rotDir = 1f;
+
+            if (rotDir != 0f)
+            {
+                turret.Rotate(Vector3.up, rotDir * turretRotateSpeed * Time.deltaTime);
+            }
+            return;
+        }
+
         Vector2 mouseScreen = Mouse.current.position.ReadValue();
         Ray ray = _mainCamera.ScreenPointToRay(mouseScreen);
 

@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
         _aliveCount--;
         deadTank.gameObject.SetActive(false);
 
-        Debug.Log($"{deadTank.name} 게임오버!");
+        Debug.Log($"{deadTank.name} Game Over!");
 
         if (_aliveCount <= 1)
             EndGame();
@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour
         {
             if (!tank.IsDead)
             {
-                Debug.Log($"승자: {tank.name}");
+                Debug.Log($"Winner: {tank.name}");
                 break;
             }
         }

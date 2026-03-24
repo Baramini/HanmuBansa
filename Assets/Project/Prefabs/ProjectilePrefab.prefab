@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1843834709821254158}
   - component: {fileID: 1903624719427634693}
   - component: {fileID: 1130244216733300107}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ProjectilePrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102,7 +102,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8030136784132672620}
   serializedVersion: 5
-  m_Mass: 1
+  m_Mass: 0.0001
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
