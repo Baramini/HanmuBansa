@@ -1,8 +1,10 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using BrmnModules.Pool;
+using System.Globalization;
+using Unity.Netcode;
 
-public class TankShooter : MonoBehaviour
+public class TankShooter : NetworkBehaviour
 {
     [Header("References")]
     [SerializeField] private GameObject projectilePrefab;
@@ -11,12 +13,6 @@ public class TankShooter : MonoBehaviour
     [SerializeField] private Transform turret;
     [SerializeField] private Renderer turretRenderer;
     [SerializeField] private Renderer barrelRenderer;
-
-    [Header("MultiPlay Variables")]
-    [SerializeField] private bool isPlayer2 = false;
-    [SerializeField] private float turretRotateSpeed = 120f;
-    private bool _aimLeft;
-    private bool _aimRight;
 
     [Header("Projectile Varialbes")]
     [SerializeField] private float minSpeed = 4f;
@@ -47,60 +43,33 @@ public class TankShooter : MonoBehaviour
     private PlayerInputActions _inputActions;
     private Camera _mainCamera;
 
-    private void Awake()
+    public override void OnNetworkSpawn()
     {
+        // -- Only the owner registers input and aim --
+        if (!IsOwner) return;
+
         _inputActions = new PlayerInputActions();
         _mainCamera = Camera.main;
 
-        Debug.Assert(_overheatRanges.Length == 4,
-            "TankShooter: _overheatRanges 배열 크기는 반드시 4여야 합니다.");
-        Debug.Assert(overheatMaterials.Length == 5,
-            "TankShooter: overheatMaterials 배열 크기는 반드시 5여야 합니다.");
+        _inputActions.Player.Fire.Enable();
+        _inputActions.Player.Fire.started += OnFireStarted;
+        _inputActions.Player.Fire.canceled += OnFireCanceled;
     }
 
-    private void OnEnable()
+    public override void OnNetworkDespawn()
     {
-        if (isPlayer2)
-        {
-            _inputActions.Player2.Fire.Enable();
-            _inputActions.Player2.Fire.started += OnFireStarted;
-            _inputActions.Player2.Fire.canceled += OnFireCanceled;
+        if (!IsOwner) return;
 
-            _inputActions.Player2.AimLeft.Enable();
-            _inputActions.Player2.AimRight.Enable();
-            _inputActions.Player2.AimLeft.performed += ctx => _aimLeft = true;
-            _inputActions.Player2.AimLeft.canceled += ctx => _aimLeft = false;
-            _inputActions.Player2.AimRight.performed += ctx => _aimRight = true;
-            _inputActions.Player2.AimRight.canceled += ctx => _aimRight = false;
-        }
-        else
-        {
-            _inputActions.Player.Fire.Enable();
-            _inputActions.Player.Fire.started += OnFireStarted;
-            _inputActions.Player.Fire.canceled += OnFireCanceled;
-        }
-    }
-
-    private void OnDisable()
-    {
-        if (isPlayer2)
-        {
-            _inputActions.Player2.Fire.started -= OnFireStarted;
-            _inputActions.Player2.Fire.canceled -= OnFireCanceled;
-            _inputActions.Player2.Fire.Disable();
-            _inputActions.Player2.AimLeft.Disable();
-            _inputActions.Player2.AimRight.Disable();
-        }
-        else
-        {
-            _inputActions.Player.Fire.started -= OnFireStarted;
-            _inputActions.Player.Fire.canceled -= OnFireCanceled;
-            _inputActions.Player.Fire.Disable();
-        }
+        _inputActions.Player.Fire.started -= OnFireStarted;
+        _inputActions.Player.Fire.canceled -= OnFireCanceled;
+        _inputActions.Player.Fire.Disable();
     }
 
     private void Update()
     {
+        // -- Only the owner handles input --
+        if (!IsOwner) return;
+
         HandleAim();
         HandleOverheat();
         SetTurretMaterial();
@@ -111,27 +80,12 @@ public class TankShooter : MonoBehaviour
         if (_isCharging)
             _chargeTime = Mathf.Min(_chargeTime + Time.deltaTime, maxChargeTime);
 
-        // Freezing
         if (!_isOverheated && _currentHeat > 0f)
             _currentHeat = Mathf.Max(0f, _currentHeat - heatCooldownRate * Time.deltaTime);
     }
 
     private void HandleAim()
     {
-        if (isPlayer2)
-        {
-            // rotate with button
-            float rotDir = 0f;
-            if (_aimLeft) rotDir = -1f;
-            if (_aimRight) rotDir = 1f;
-
-            if (rotDir != 0f)
-            {
-                turret.Rotate(Vector3.up, rotDir * turretRotateSpeed * Time.deltaTime);
-            }
-            return;
-        }
-
         Vector2 mouseScreen = Mouse.current.position.ReadValue();
         Ray ray = _mainCamera.ScreenPointToRay(mouseScreen);
 
@@ -159,17 +113,24 @@ public class TankShooter : MonoBehaviour
     private void OnFireCanceled(InputAction.CallbackContext ctx)
     {
         if (!_isCharging) return;
-        Fire();
-        _isCharging = false;
-        _fireCoolTimer = fireCoolTime;
-    }
 
-    private void Fire()
-    {
         float ratio = _chargeTime / maxChargeTime;
         float speed = Mathf.Lerp(minSpeed, maxSpeed, ratio);
         Vector3 velocity = firePoint.forward * speed;
 
+        // -- Request server to spawn projectile --
+        FireServerRpc(velocity);
+
+        AddHeat(ratio);
+        _isCharging = false;
+        _fireCoolTimer = fireCoolTime;
+    }
+
+    // -- ServerRpc: runs on server, called by owner client --
+    // RequireOwnership: only the owner of this object can call this
+    [ServerRpc(RequireOwnership = true)]
+    private void FireServerRpc(Vector3 velocity)
+    {
         GameObject obj = PoolManager.Instance.Get(
             projectilePrefab,
             firePoint.position,
@@ -177,8 +138,7 @@ public class TankShooter : MonoBehaviour
             projectileParent
         );
         obj.GetComponent<Projectile>().Init(projectilePrefab, velocity);
-
-        AddHeat(ratio);
+        obj.GetComponent<NetworkObject>().Spawn();
     }
 
     private void AddHeat(float chargeRatio)

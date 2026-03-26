@@ -1,12 +1,12 @@
 using UnityEngine;
+using Unity.Netcode;
 using System;
 
-public class TankHealth : MonoBehaviour
+public class TankHealth : NetworkBehaviour
 {
+    [SerializeField] private int maxHp = 2;
     [SerializeField] private Renderer bodyRenderer;
     [SerializeField] private Material damagedMaterial;
-
-    [SerializeField] private int maxHp = 2;
 
     public int CurrentHp { get; private set; }
     public bool IsDead { get; private set; }
@@ -14,27 +14,46 @@ public class TankHealth : MonoBehaviour
     public event Action<int> OnDamaged;
     public event Action OnDead;
 
-    private void Awake()
+    public override void OnNetworkSpawn()
     {
         CurrentHp = maxHp;
     }
 
     public void TakeDamage(int amount = 1)
     {
+        // -- Damage is only processed on the server --
+        if (!IsServer) return;
         if (IsDead) return;
 
         CurrentHp = Mathf.Max(0, CurrentHp - amount);
-        OnDamaged?.Invoke(CurrentHp);
-
-        if (CurrentHp == 1 && bodyRenderer != null)
-            bodyRenderer.material = damagedMaterial;
 
         if (CurrentHp <= 0)
-            Die();
+        {
+            // -- Notify all clients this tank is dead --
+            DieClientRpc();
+        }
+        else
+        {
+            // -- Notify all clients of damage visual --
+            ApplyDamageClientRpc(CurrentHp);
+        }
     }
 
-    private void Die()
+    [ClientRpc]
+    private void ApplyDamageClientRpc(int remainingHp)
     {
+        // -- Update visuals on all clients --
+        OnDamaged?.Invoke(remainingHp);
+
+        if (remainingHp == 1 && bodyRenderer != null)
+            bodyRenderer.material = damagedMaterial;
+    }
+
+    [ClientRpc]
+    private void DieClientRpc()
+    {
+        // -- Runs on ALL clients including server --
+        // -- Each client handles death locally --
         IsDead = true;
         OnDead?.Invoke();
     }

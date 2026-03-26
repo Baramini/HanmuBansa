@@ -1,7 +1,8 @@
 using UnityEngine;
+using Unity.Netcode;
 using BrmnModules.Pool;
 
-public class Projectile : MonoBehaviour
+public class Projectile : NetworkBehaviour
 {
     private Rigidbody _rb;
     private GameObject _prefabRef;
@@ -21,11 +22,15 @@ public class Projectile : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!IsServer) return;
         _lastVelocity = _rb.linearVelocity;
     }
 
     private void OnCollisionEnter(Collision collision)
     {
+        // -- Only server processes collision --
+        if (!IsServer) return;
+
         GameObject hit = collision.gameObject;
 
         if (hit.layer == LayerMask.NameToLayer("Wall"))
@@ -62,6 +67,11 @@ public class Projectile : MonoBehaviour
     public void ReturnToPool()
     {
         if (_isReturned) return;
+
+        // -- Despawn from network before returning to pool --
+        if (IsSpawned)
+            NetworkObject.Despawn(false);
+
         _isReturned = true;
         PoolManager.Instance.Release(_prefabRef, gameObject);
     }

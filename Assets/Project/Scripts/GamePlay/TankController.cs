@@ -1,14 +1,14 @@
-using UnityEngine.InputSystem;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using Unity.Netcode;
 
-public class TankController : MonoBehaviour
+// NetworkBehaviour: MonoBehaviour + network functionality
+// IsOwner: true only for the local player who owns this object
+public class TankController : NetworkBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float rotateSpeed = 180f;
-
-    // divide 1p, 2p
-    [SerializeField] private bool isPlayer2 = false;
 
     private Rigidbody _rb;
     private PlayerInputActions _inputActions;
@@ -20,36 +20,26 @@ public class TankController : MonoBehaviour
         _inputActions = new PlayerInputActions();
     }
 
-    private void OnEnable()
+    // OnNetworkSpawn: called when this object is spawned on the network
+    // Use this instead of Start() for network objects
+    public override void OnNetworkSpawn()
     {
-        if (isPlayer2)
-        {
-            _inputActions.Player2.Move.Enable();
-            _inputActions.Player2.Move.performed += OnMove;
-            _inputActions.Player2.Move.canceled += OnMove;
-        }
-        else
-        {
-            _inputActions.Player.Move.Enable();
-            _inputActions.Player.Move.performed += OnMove;
-            _inputActions.Player.Move.canceled += OnMove;
-        }
+        // -- Only the owner registers input --
+        // Other clients' tanks are controlled by NetworkTransform
+        if (!IsOwner) return;
+
+        _inputActions.Player.Move.Enable();
+        _inputActions.Player.Move.performed += OnMove;
+        _inputActions.Player.Move.canceled += OnMove;
     }
 
-    private void OnDisable()
+    public override void OnNetworkDespawn()
     {
-        if (isPlayer2)
-        {
-            _inputActions.Player2.Move.performed -= OnMove;
-            _inputActions.Player2.Move.canceled -= OnMove;
-            _inputActions.Player2.Move.Disable();
-        }
-        else
-        {
-            _inputActions.Player.Move.performed -= OnMove;
-            _inputActions.Player.Move.canceled -= OnMove;
-            _inputActions.Player.Move.Disable();
-        }
+        if (!IsOwner) return;
+
+        _inputActions.Player.Move.performed -= OnMove;
+        _inputActions.Player.Move.canceled -= OnMove;
+        _inputActions.Player.Move.Disable();
     }
 
     private void OnMove(InputAction.CallbackContext ctx)
@@ -59,16 +49,16 @@ public class TankController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // -- Only the owner moves their own tank --
+        if (!IsOwner) return;
         HandleMovement();
     }
 
     private void HandleMovement()
     {
-        // forward & backward
         Vector3 moveDir = transform.forward * _moveInput.y;
         _rb.MovePosition(_rb.position + moveDir * moveSpeed * Time.fixedDeltaTime);
 
-        // left & right rotation
         float rotate = _moveInput.x * rotateSpeed * Time.fixedDeltaTime;
         Quaternion deltaRotation = Quaternion.Euler(0f, rotate, 0f);
         _rb.MoveRotation(_rb.rotation * deltaRotation);
