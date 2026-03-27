@@ -6,6 +6,7 @@ using System.Collections.Generic;
 // Assigns a unique spawn point to each connecting client.
 public class SpawnManager : NetworkBehaviour
 {
+    [SerializeField] private Transform projectileParent;
     [SerializeField] private List<Transform> spawnPoints;
 
     public override void OnNetworkSpawn()
@@ -37,5 +38,6 @@ public class SpawnManager : NetworkBehaviour
 
         // -- Assign GameManager players
         GameManager.Instance.SetPlayer(client.PlayerObject.GetComponent<TankHealth>());
+        client.PlayerObject.GetComponent<TankShooter>().SetProjectileParent(projectileParent);
     }
 }

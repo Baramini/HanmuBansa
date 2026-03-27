@@ -1,20 +1,18 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using BrmnModules.Pool;
-using System.Globalization;
 using Unity.Netcode;
+using BrmnModules.Pool;
 
 public class TankShooter : NetworkBehaviour
 {
     [Header("References")]
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private Transform firePoint;
-    [SerializeField] private Transform projectileParent;
     [SerializeField] private Transform turret;
     [SerializeField] private Renderer turretRenderer;
     [SerializeField] private Renderer barrelRenderer;
 
-    [Header("Projectile Varialbes")]
+    [Header("Projectile Variables")]
     [SerializeField] private float minSpeed = 4f;
     [SerializeField] private float maxSpeed = 6f;
     [SerializeField] private float maxChargeTime = 2f;
@@ -27,25 +25,47 @@ public class TankShooter : NetworkBehaviour
     [SerializeField] private float[] _overheatRanges;
 
     public float ChargeRatio => _chargeTime / maxChargeTime;
-    public float HeatRatio => _currentHeat / maxHeat;
-    public bool IsOverheated => _isOverheated;
+
+    // -- NetworkVariable: synced across all clients automatically --
+    // Server writes, all clients read
+    private NetworkVariable<float> _networkHeat = new NetworkVariable<float>(
+        0f,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
+    private NetworkVariable<bool> _networkIsOverheated = new NetworkVariable<bool>(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
+
+    // -- Local cache for owner's input handling --
+    // Owner uses these for immediate response without waiting for server
+    private float _localHeat;
+    private bool _localIsOverheated;
 
     private int _currentMaterialIndex = -1;
-
     private float _chargeTime;
-    private float _currentHeat;
     private float _overheatTimer;
     private float _fireCoolTimer;
-
     private bool _isCharging;
-    private bool _isOverheated;
 
+    private Transform projectileParent;
     private PlayerInputActions _inputActions;
     private Camera _mainCamera;
 
+    public void SetProjectileParent(Transform parent)
+    {
+        projectileParent = parent;
+    }
+
     public override void OnNetworkSpawn()
     {
-        // -- Only the owner registers input and aim --
+        // -- Subscribe to NetworkVariable changes on all clients --
+        // This updates visuals whenever heat value changes
+        _networkHeat.OnValueChanged += OnHeatChanged;
+        _networkIsOverheated.OnValueChanged += OnOverheatedChanged;
+
         if (!IsOwner) return;
 
         _inputActions = new PlayerInputActions();
@@ -58,6 +78,10 @@ public class TankShooter : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
+        // -- Always unsubscribe to prevent memory leaks --
+        _networkHeat.OnValueChanged -= OnHeatChanged;
+        _networkIsOverheated.OnValueChanged -= OnOverheatedChanged;
+
         if (!IsOwner) return;
 
         _inputActions.Player.Fire.started -= OnFireStarted;
@@ -65,14 +89,25 @@ public class TankShooter : NetworkBehaviour
         _inputActions.Player.Fire.Disable();
     }
 
+    // -- Called on ALL clients when _networkHeat changes --
+    private void OnHeatChanged(float previous, float current)
+    {
+        SetTurretMaterial(current);
+    }
+
+    // -- Called on ALL clients when _networkIsOverheated changes --
+    private void OnOverheatedChanged(bool previous, bool current)
+    {
+        // -- TODO: overheat visual effect (smoke, red color) --
+        // Will be implemented in art pass
+    }
+
     private void Update()
     {
-        // -- Only the owner handles input --
+        // -- Only owner handles input --
         if (!IsOwner) return;
 
         HandleAim();
-        HandleOverheat();
-        SetTurretMaterial();
 
         if (_fireCoolTimer > 0f)
             _fireCoolTimer -= Time.deltaTime;
@@ -80,8 +115,30 @@ public class TankShooter : NetworkBehaviour
         if (_isCharging)
             _chargeTime = Mathf.Min(_chargeTime + Time.deltaTime, maxChargeTime);
 
-        if (!_isOverheated && _currentHeat > 0f)
-            _currentHeat = Mathf.Max(0f, _currentHeat - heatCooldownRate * Time.deltaTime);
+        // -- Local cooldown for immediate UI response --
+        if (!_localIsOverheated && _localHeat > 0f)
+            _localHeat = Mathf.Max(0f, _localHeat - heatCooldownRate * Time.deltaTime);
+
+        // -- Sync local heat to server --
+        if (IsServer)
+            UpdateHeatOnServer(_localHeat, _localIsOverheated);
+        else
+            SyncHeatServerRpc(_localHeat, _localIsOverheated);
+
+        // -- Handle overheat timer locally --
+        HandleOverheatTimer();
+    }
+
+    private void HandleOverheatTimer()
+    {
+        if (!_localIsOverheated) return;
+
+        _overheatTimer -= Time.deltaTime;
+        if (_overheatTimer <= 0f)
+        {
+            _localIsOverheated = false;
+            _localHeat = 0f;
+        }
     }
 
     private void HandleAim()
@@ -97,15 +154,14 @@ public class TankShooter : NetworkBehaviour
             direction.y = 0f;
 
             if (direction.sqrMagnitude > 0.01f)
-            {
                 turret.rotation = Quaternion.LookRotation(direction);
-            }
         }
     }
 
     private void OnFireStarted(InputAction.CallbackContext ctx)
     {
-        if (_isOverheated || _fireCoolTimer > 0f) return;
+        // -- Check local state for immediate response --
+        if (_localIsOverheated || _fireCoolTimer > 0f) return;
         _isCharging = true;
         _chargeTime = 0f;
     }
@@ -118,58 +174,58 @@ public class TankShooter : NetworkBehaviour
         float speed = Mathf.Lerp(minSpeed, maxSpeed, ratio);
         Vector3 velocity = firePoint.forward * speed;
 
-        // -- Request server to spawn projectile --
-        FireServerRpc(velocity);
+        FireServerRpc(firePoint.position, firePoint.rotation, velocity);
 
-        AddHeat(ratio);
+        AddHeatLocally(ratio);
         _isCharging = false;
         _fireCoolTimer = fireCoolTime;
     }
 
-    // -- ServerRpc: runs on server, called by owner client --
-    // RequireOwnership: only the owner of this object can call this
     [ServerRpc(RequireOwnership = true)]
-    private void FireServerRpc(Vector3 velocity)
+    private void FireServerRpc(Vector3 spawnPosition, Quaternion spawnRotation, Vector3 velocity)
     {
         GameObject obj = PoolManager.Instance.Get(
             projectilePrefab,
-            firePoint.position,
-            firePoint.rotation,
-            projectileParent
+            spawnPosition,
+            spawnRotation,
+            null
         );
-        obj.GetComponent<Projectile>().Init(projectilePrefab, velocity);
         obj.GetComponent<NetworkObject>().Spawn();
+        obj.GetComponent<Projectile>().InitOnServer(projectilePrefab, velocity);
     }
 
-    private void AddHeat(float chargeRatio)
+    // -- Update NetworkVariables on server directly (Host) --
+    private void UpdateHeatOnServer(float heat, bool isOverheated)
     {
-        _currentHeat = Mathf.Clamp(_currentHeat + 15f + chargeRatio * 10f, 0f, maxHeat);
-
-        if (_currentHeat >= maxHeat)
-            TriggerOverheat();
+        _networkHeat.Value = heat;
+        _networkIsOverheated.Value = isOverheated;
     }
 
-    private void TriggerOverheat()
+    // -- Send heat state to server from client --
+    [ServerRpc(RequireOwnership = true)]
+    private void SyncHeatServerRpc(float heat, bool isOverheated)
     {
-        _isOverheated = true;
+        _networkHeat.Value = heat;
+        _networkIsOverheated.Value = isOverheated;
+    }
+
+    private void AddHeatLocally(float chargeRatio)
+    {
+        _localHeat = Mathf.Clamp(_localHeat + 15f + chargeRatio * 10f, 0f, maxHeat);
+
+        if (_localHeat >= maxHeat)
+            TriggerOverheatLocally();
+    }
+
+    private void TriggerOverheatLocally()
+    {
+        _localIsOverheated = true;
         _overheatTimer = 5f;
     }
 
-    private void HandleOverheat()
+    private void SetTurretMaterial(float heat)
     {
-        if (!_isOverheated) return;
-
-        _overheatTimer -= Time.deltaTime;
-        if (_overheatTimer <= 0f)
-        {
-            _isOverheated = false;
-            _currentHeat = 0f;
-        }
-    }
-
-    private void SetTurretMaterial()
-    {
-        int index = _currentHeat switch
+        int index = heat switch
         {
             var f when f >= _overheatRanges[3] => 4,
             var f when f >= _overheatRanges[2] => 3,

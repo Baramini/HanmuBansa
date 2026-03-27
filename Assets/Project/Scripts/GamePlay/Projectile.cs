@@ -11,13 +11,36 @@ public class Projectile : NetworkBehaviour
     private Vector3 _lastVelocity;
     private bool _isReturned = false;
 
-    public void Init(GameObject prefabRef, Vector3 velocity)
+    private void Awake()
     {
-        _isReturned = false;
+        _rb = GetComponent<Rigidbody>();
+    }
+
+    // -- Called on server after Spawn() --
+    // Sends velocity to all clients explicitly
+    public void InitOnServer(GameObject prefabRef, Vector3 velocity)
+    {
         _prefabRef = prefabRef;
+        _speed = velocity.magnitude;
+        _isReturned = false;
+
+        // -- Set velocity on server --
+        _rb.linearVelocity = velocity;
+
+        // -- Explicitly sync velocity to all clients --
+        SetVelocityClientRpc(velocity);
+    }
+
+    [ClientRpc]
+    private void SetVelocityClientRpc(Vector3 velocity)
+    {
+        // -- Set velocity on each client's Rigidbody --
+        // Skip server as it's already set in InitOnServer()
+        if (IsServer) return;
+
         _rb = GetComponent<Rigidbody>();
         _rb.linearVelocity = velocity;
-        _speed = _rb.linearVelocity.magnitude;
+        _speed = velocity.magnitude;
     }
 
     private void FixedUpdate()
