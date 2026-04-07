@@ -107,6 +107,8 @@ public class TankShooter : NetworkBehaviour
         // -- Only owner handles input --
         if (!IsOwner) return;
 
+        if (GameManager.Instance == null || !GameManager.Instance.IsGameStarted) return;
+
         HandleAim();
 
         if (_fireCoolTimer > 0f)
@@ -160,6 +162,8 @@ public class TankShooter : NetworkBehaviour
 
     private void OnFireStarted(InputAction.CallbackContext ctx)
     {
+        if (GameManager.Instance == null || !GameManager.Instance.IsGameStarted) return;
+
         // -- Check local state for immediate response --
         if (_localIsOverheated || _fireCoolTimer > 0f) return;
         _isCharging = true;

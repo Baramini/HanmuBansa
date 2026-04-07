@@ -51,6 +51,9 @@ public class TankController : NetworkBehaviour
     {
         // -- Only the owner moves their own tank --
         if (!IsOwner) return;
+
+        if (GameManager.Instance == null || !GameManager.Instance.IsGameStarted) return;
+
         HandleMovement();
     }
 
