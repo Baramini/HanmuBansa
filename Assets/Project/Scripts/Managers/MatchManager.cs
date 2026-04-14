@@ -241,13 +241,14 @@ public class MatchManager : NetworkBehaviour
 
         int playerCount = NetworkManager.Singleton.ConnectedClients.Count;
 
-        // -- Minimum 2 players required --
         if (playerCount < 2)
         {
             Debug.Log("Need at least 2 players to start.");
             return;
         }
 
+        // -- Spawn players first, then start game --
+        FindFirstObjectByType<SpawnManager>()?.SpawnAllPlayers();
         GameManager.Instance.StartGame();
     }
 
@@ -278,7 +279,7 @@ public class MatchManager : NetworkBehaviour
         );
     }
 
-    private void OnDestroy()
+    public override void OnDestroy()
     {
         // -- Release Relay/Lobby on app quit --
         _ = LeaveRoomAsync();

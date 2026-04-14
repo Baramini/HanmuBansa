@@ -1,166 +1,452 @@
 fileFormatVersion: 2
 guid: 2b2ab5b92b28e4906a39b2e37aedffcf
-timeCreated: 1486845165
-licenseType: Store
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70946
+  packageName: Cartoon Military Model Pack
+  packageVersion: 5.2
+  assetPath: Assets/Project/Asset_Models/CartoonMilitaryModelPack/Tank/Tank_01.fbx
+  uploadId: 250008
 ModelImporter:
-  serializedVersion: 18
-  fileIDToRecycleName:
-    100000: pCube14
-    100002: polySurface6
-    100004: //RootNode
-    100006: Tank_01
-    100008: Tank_01_Body
-    100010: Tank_01_Chain
-    100012: Tank_01_Chain02
-    100014: Tank_01_MainGun
-    100016: Tank_01_MainGunBody
-    100018: Tank_01_pAntena
-    100020: Tank_01_pAntena2
-    100022: Tank_01_UpperBody
-    100024: Tank_01_UpperBody 1
-    100026: Tank_01_Wheel01
-    100028: Tank_01_Wheel02
-    100030: Tank_01_Wheel03
-    100032: Tank_01_Wheel04
-    100034: Tank_01_Wheel05
-    100036: Tank_01_Wheel06
-    100038: Tank_01_Wheel07
-    100040: Tank_01_Wheel08
-    100042: Tank_01_Wheel09
-    100044: Tank_01_Wheel10
-    100046: Tank_01_Wheel11
-    100048: Tank_01_Wheel12
-    100050: Tank_01_Wheel13
-    100052: Tank_01_Wheel14
-    100054: Tank_01_Wheel15
-    100056: Tank_01_Wheel16
-    100058: Tank_01_Wheels
-    100060: transform24
-    100062: Tank_01_MainGunPart
-    400000: pCube14
-    400002: polySurface6
-    400004: //RootNode
-    400006: Tank_01
-    400008: Tank_01_Body
-    400010: Tank_01_Chain
-    400012: Tank_01_Chain02
-    400014: Tank_01_MainGun
-    400016: Tank_01_MainGunBody
-    400018: Tank_01_pAntena
-    400020: Tank_01_pAntena2
-    400022: Tank_01_UpperBody
-    400024: Tank_01_UpperBody 1
-    400026: Tank_01_Wheel01
-    400028: Tank_01_Wheel02
-    400030: Tank_01_Wheel03
-    400032: Tank_01_Wheel04
-    400034: Tank_01_Wheel05
-    400036: Tank_01_Wheel06
-    400038: Tank_01_Wheel07
-    400040: Tank_01_Wheel08
-    400042: Tank_01_Wheel09
-    400044: Tank_01_Wheel10
-    400046: Tank_01_Wheel11
-    400048: Tank_01_Wheel12
-    400050: Tank_01_Wheel13
-    400052: Tank_01_Wheel14
-    400054: Tank_01_Wheel15
-    400056: Tank_01_Wheel16
-    400058: Tank_01_Wheels
-    400060: transform24
-    400062: Tank_01_MainGunPart
-    2300000: Tank_01_Body
-    2300002: Tank_01_Chain
-    2300004: Tank_01_Chain02
-    2300006: Tank_01_MainGun
-    2300008: Tank_01_MainGunBody
-    2300010: Tank_01_pAntena
-    2300012: Tank_01_pAntena2
-    2300014: Tank_01_UpperBody 1
-    2300016: Tank_01_Wheel01
-    2300018: Tank_01_Wheel02
-    2300020: Tank_01_Wheel03
-    2300022: Tank_01_Wheel04
-    2300024: Tank_01_Wheel05
-    2300026: Tank_01_Wheel06
-    2300028: Tank_01_Wheel07
-    2300030: Tank_01_Wheel08
-    2300032: Tank_01_Wheel09
-    2300034: Tank_01_Wheel10
-    2300036: Tank_01_Wheel11
-    2300038: Tank_01_Wheel12
-    2300040: Tank_01_Wheel13
-    2300042: Tank_01_Wheel14
-    2300044: Tank_01_Wheel15
-    2300046: Tank_01_Wheel16
-    3300000: Tank_01_Body
-    3300002: Tank_01_Chain
-    3300004: Tank_01_Chain02
-    3300006: Tank_01_MainGun
-    3300008: Tank_01_MainGunBody
-    3300010: Tank_01_pAntena
-    3300012: Tank_01_pAntena2
-    3300014: Tank_01_UpperBody 1
-    3300016: Tank_01_Wheel01
-    3300018: Tank_01_Wheel02
-    3300020: Tank_01_Wheel03
-    3300022: Tank_01_Wheel04
-    3300024: Tank_01_Wheel05
-    3300026: Tank_01_Wheel06
-    3300028: Tank_01_Wheel07
-    3300030: Tank_01_Wheel08
-    3300032: Tank_01_Wheel09
-    3300034: Tank_01_Wheel10
-    3300036: Tank_01_Wheel11
-    3300038: Tank_01_Wheel12
-    3300040: Tank_01_Wheel13
-    3300042: Tank_01_Wheel14
-    3300044: Tank_01_Wheel15
-    3300046: Tank_01_Wheel16
-    4300000: Tank_01_Chain02
-    4300002: Tank_01_Chain
-    4300004: Tank_01_Wheel16
-    4300006: Tank_01_Wheel15
-    4300008: Tank_01_Wheel14
-    4300010: Tank_01_Wheel13
-    4300012: Tank_01_Wheel12
-    4300014: Tank_01_Wheel11
-    4300016: Tank_01_Wheel10
-    4300018: Tank_01_Wheel09
-    4300020: Tank_01_Wheel08
-    4300022: Tank_01_Wheel07
-    4300024: Tank_01_Wheel06
-    4300026: Tank_01_Wheel05
-    4300028: Tank_01_Wheel04
-    4300030: Tank_01_Wheel03
-    4300032: Tank_01_Wheel02
-    4300034: Tank_01_Wheel01
-    4300036: Tank_01_Body
-    4300038: Tank_01_pAntena
-    4300040: Tank_01_pAntena2
-    4300042: Tank_01_UpperBody
-    4300044: Tank_01_MainGunBody
-    4300046: Tank_01_MainGun
-    9500000: //RootNode
+  serializedVersion: 24200
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: pCube14
+  - first:
+      1: 100002
+    second: polySurface6
+  - first:
+      1: 100004
+    second: //RootNode
+  - first:
+      1: 100006
+    second: Tank_01
+  - first:
+      1: 100008
+    second: Tank_01_Body
+  - first:
+      1: 100010
+    second: Tank_01_Chain
+  - first:
+      1: 100012
+    second: Tank_01_Chain02
+  - first:
+      1: 100014
+    second: Tank_01_MainGun
+  - first:
+      1: 100016
+    second: Tank_01_MainGunBody
+  - first:
+      1: 100018
+    second: Tank_01_pAntena
+  - first:
+      1: 100020
+    second: Tank_01_pAntena2
+  - first:
+      1: 100022
+    second: Tank_01_UpperBody
+  - first:
+      1: 100024
+    second: Tank_01_UpperBody 1
+  - first:
+      1: 100026
+    second: Tank_01_Wheel01
+  - first:
+      1: 100028
+    second: Tank_01_Wheel02
+  - first:
+      1: 100030
+    second: Tank_01_Wheel03
+  - first:
+      1: 100032
+    second: Tank_01_Wheel04
+  - first:
+      1: 100034
+    second: Tank_01_Wheel05
+  - first:
+      1: 100036
+    second: Tank_01_Wheel06
+  - first:
+      1: 100038
+    second: Tank_01_Wheel07
+  - first:
+      1: 100040
+    second: Tank_01_Wheel08
+  - first:
+      1: 100042
+    second: Tank_01_Wheel09
+  - first:
+      1: 100044
+    second: Tank_01_Wheel10
+  - first:
+      1: 100046
+    second: Tank_01_Wheel11
+  - first:
+      1: 100048
+    second: Tank_01_Wheel12
+  - first:
+      1: 100050
+    second: Tank_01_Wheel13
+  - first:
+      1: 100052
+    second: Tank_01_Wheel14
+  - first:
+      1: 100054
+    second: Tank_01_Wheel15
+  - first:
+      1: 100056
+    second: Tank_01_Wheel16
+  - first:
+      1: 100058
+    second: Tank_01_Wheels
+  - first:
+      1: 100060
+    second: transform24
+  - first:
+      1: 100062
+    second: Tank_01_MainGunPart
+  - first:
+      4: 400000
+    second: pCube14
+  - first:
+      4: 400002
+    second: polySurface6
+  - first:
+      4: 400004
+    second: //RootNode
+  - first:
+      4: 400006
+    second: Tank_01
+  - first:
+      4: 400008
+    second: Tank_01_Body
+  - first:
+      4: 400010
+    second: Tank_01_Chain
+  - first:
+      4: 400012
+    second: Tank_01_Chain02
+  - first:
+      4: 400014
+    second: Tank_01_MainGun
+  - first:
+      4: 400016
+    second: Tank_01_MainGunBody
+  - first:
+      4: 400018
+    second: Tank_01_pAntena
+  - first:
+      4: 400020
+    second: Tank_01_pAntena2
+  - first:
+      4: 400022
+    second: Tank_01_UpperBody
+  - first:
+      4: 400024
+    second: Tank_01_UpperBody 1
+  - first:
+      4: 400026
+    second: Tank_01_Wheel01
+  - first:
+      4: 400028
+    second: Tank_01_Wheel02
+  - first:
+      4: 400030
+    second: Tank_01_Wheel03
+  - first:
+      4: 400032
+    second: Tank_01_Wheel04
+  - first:
+      4: 400034
+    second: Tank_01_Wheel05
+  - first:
+      4: 400036
+    second: Tank_01_Wheel06
+  - first:
+      4: 400038
+    second: Tank_01_Wheel07
+  - first:
+      4: 400040
+    second: Tank_01_Wheel08
+  - first:
+      4: 400042
+    second: Tank_01_Wheel09
+  - first:
+      4: 400044
+    second: Tank_01_Wheel10
+  - first:
+      4: 400046
+    second: Tank_01_Wheel11
+  - first:
+      4: 400048
+    second: Tank_01_Wheel12
+  - first:
+      4: 400050
+    second: Tank_01_Wheel13
+  - first:
+      4: 400052
+    second: Tank_01_Wheel14
+  - first:
+      4: 400054
+    second: Tank_01_Wheel15
+  - first:
+      4: 400056
+    second: Tank_01_Wheel16
+  - first:
+      4: 400058
+    second: Tank_01_Wheels
+  - first:
+      4: 400060
+    second: transform24
+  - first:
+      4: 400062
+    second: Tank_01_MainGunPart
+  - first:
+      23: 2300000
+    second: Tank_01_Body
+  - first:
+      23: 2300002
+    second: Tank_01_Chain
+  - first:
+      23: 2300004
+    second: Tank_01_Chain02
+  - first:
+      23: 2300006
+    second: Tank_01_MainGun
+  - first:
+      23: 2300008
+    second: Tank_01_MainGunBody
+  - first:
+      23: 2300010
+    second: Tank_01_pAntena
+  - first:
+      23: 2300012
+    second: Tank_01_pAntena2
+  - first:
+      23: 2300014
+    second: Tank_01_UpperBody 1
+  - first:
+      23: 2300016
+    second: Tank_01_Wheel01
+  - first:
+      23: 2300018
+    second: Tank_01_Wheel02
+  - first:
+      23: 2300020
+    second: Tank_01_Wheel03
+  - first:
+      23: 2300022
+    second: Tank_01_Wheel04
+  - first:
+      23: 2300024
+    second: Tank_01_Wheel05
+  - first:
+      23: 2300026
+    second: Tank_01_Wheel06
+  - first:
+      23: 2300028
+    second: Tank_01_Wheel07
+  - first:
+      23: 2300030
+    second: Tank_01_Wheel08
+  - first:
+      23: 2300032
+    second: Tank_01_Wheel09
+  - first:
+      23: 2300034
+    second: Tank_01_Wheel10
+  - first:
+      23: 2300036
+    second: Tank_01_Wheel11
+  - first:
+      23: 2300038
+    second: Tank_01_Wheel12
+  - first:
+      23: 2300040
+    second: Tank_01_Wheel13
+  - first:
+      23: 2300042
+    second: Tank_01_Wheel14
+  - first:
+      23: 2300044
+    second: Tank_01_Wheel15
+  - first:
+      23: 2300046
+    second: Tank_01_Wheel16
+  - first:
+      33: 3300000
+    second: Tank_01_Body
+  - first:
+      33: 3300002
+    second: Tank_01_Chain
+  - first:
+      33: 3300004
+    second: Tank_01_Chain02
+  - first:
+      33: 3300006
+    second: Tank_01_MainGun
+  - first:
+      33: 3300008
+    second: Tank_01_MainGunBody
+  - first:
+      33: 3300010
+    second: Tank_01_pAntena
+  - first:
+      33: 3300012
+    second: Tank_01_pAntena2
+  - first:
+      33: 3300014
+    second: Tank_01_UpperBody 1
+  - first:
+      33: 3300016
+    second: Tank_01_Wheel01
+  - first:
+      33: 3300018
+    second: Tank_01_Wheel02
+  - first:
+      33: 3300020
+    second: Tank_01_Wheel03
+  - first:
+      33: 3300022
+    second: Tank_01_Wheel04
+  - first:
+      33: 3300024
+    second: Tank_01_Wheel05
+  - first:
+      33: 3300026
+    second: Tank_01_Wheel06
+  - first:
+      33: 3300028
+    second: Tank_01_Wheel07
+  - first:
+      33: 3300030
+    second: Tank_01_Wheel08
+  - first:
+      33: 3300032
+    second: Tank_01_Wheel09
+  - first:
+      33: 3300034
+    second: Tank_01_Wheel10
+  - first:
+      33: 3300036
+    second: Tank_01_Wheel11
+  - first:
+      33: 3300038
+    second: Tank_01_Wheel12
+  - first:
+      33: 3300040
+    second: Tank_01_Wheel13
+  - first:
+      33: 3300042
+    second: Tank_01_Wheel14
+  - first:
+      33: 3300044
+    second: Tank_01_Wheel15
+  - first:
+      33: 3300046
+    second: Tank_01_Wheel16
+  - first:
+      43: 4300000
+    second: Tank_01_Chain02
+  - first:
+      43: 4300002
+    second: Tank_01_Chain
+  - first:
+      43: 4300004
+    second: Tank_01_Wheel16
+  - first:
+      43: 4300006
+    second: Tank_01_Wheel15
+  - first:
+      43: 4300008
+    second: Tank_01_Wheel14
+  - first:
+      43: 4300010
+    second: Tank_01_Wheel13
+  - first:
+      43: 4300012
+    second: Tank_01_Wheel12
+  - first:
+      43: 4300014
+    second: Tank_01_Wheel11
+  - first:
+      43: 4300016
+    second: Tank_01_Wheel10
+  - first:
+      43: 4300018
+    second: Tank_01_Wheel09
+  - first:
+      43: 4300020
+    second: Tank_01_Wheel08
+  - first:
+      43: 4300022
+    second: Tank_01_Wheel07
+  - first:
+      43: 4300024
+    second: Tank_01_Wheel06
+  - first:
+      43: 4300026
+    second: Tank_01_Wheel05
+  - first:
+      43: 4300028
+    second: Tank_01_Wheel04
+  - first:
+      43: 4300030
+    second: Tank_01_Wheel03
+  - first:
+      43: 4300032
+    second: Tank_01_Wheel02
+  - first:
+      43: 4300034
+    second: Tank_01_Wheel01
+  - first:
+      43: 4300036
+    second: Tank_01_Body
+  - first:
+      43: 4300038
+    second: Tank_01_pAntena
+  - first:
+      43: 4300040
+    second: Tank_01_pAntena2
+  - first:
+      43: 4300042
+    second: Tank_01_UpperBody
+  - first:
+      43: 4300044
+    second: Tank_01_MainGunBody
+  - first:
+      43: 4300046
+    second: Tank_01_MainGun
+  - first:
+      95: 9500000
+    second: //RootNode
+  externalObjects: {}
   materials:
-    importMaterials: 1
+    materialImportMode: 1
     materialName: 0
     materialSearch: 1
+    materialLocation: 0
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
+    resampleCurves: 1
     optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
     motionNodeName: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
     animationCompression: 1
-    animationRotationError: .5
-    animationPositionError: .5
-    animationScaleError: .5
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
     animationWrapMode: 0
     extraExposedTransformPaths: []
+    extraUserProperties: []
     clipAnimations: []
     isReadable: 1
   meshes:
@@ -168,48 +454,75 @@ ModelImporter:
     globalScale: 10
     meshCompression: 0
     addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 0
+    importVisibility: 0
     importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
+    nodeNameCollisionStrategy: 0
+    fileIdsGeneration: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
-    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
+    meshOptimizationFlags: -1
+    indexFormat: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 0
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
     useFileScale: 1
+    strictVertexDataChecks: 0
   tangentSpace:
     normalSmoothAngle: 60
-    splitTangentsAcrossUV: 1
     normalImportMode: 0
-    tangentImportMode: 1
+    tangentImportMode: 4
+    normalCalculationMode: 0
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 1
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
   importAnimation: 1
-  copyAvatar: 0
   humanDescription:
+    serializedVersion: 3
     human: []
     skeleton: []
-    armTwist: .5
-    foreArmTwist: .5
-    upperLegTwist: .5
-    legTwist: .5
-    armStretch: .0500000007
-    legStretch: .0500000007
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
     feetSpacing: 0
+    globalScale: 10
     rootMotionBoneName: 
     hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 0
   lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
+  avatarSetup: 1
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 0
+  importBlendShapeDeformPercent: 0
+  remapMaterialsIfMaterialImportModeIsNone: 1
   additionalBone: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 70946
-  packageName: Cartoon Military Model Pack
-  packageVersion: 5.2
-  assetPath: Assets/CartoonMilitaryModelPack/OriginalMeshes&Materials/Tank/Tank_01.fbx
-  uploadId: 250008

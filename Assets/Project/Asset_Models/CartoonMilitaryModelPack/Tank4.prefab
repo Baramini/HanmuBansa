@@ -1,62 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &100898
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 467198}
-  - component: {fileID: 9592210}
-  m_Layer: 0
-  m_Name: Tank_05
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &467198
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 100898}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 466634}
-  - {fileID: 451432}
-  - {fileID: 454948}
-  m_Father: {fileID: 495738}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &9592210
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 100898}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 909b45c747dfc4834990f0b45fe4aa2e, type: 3}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &103480
 GameObject:
   m_ObjectHideFlags: 0
@@ -68,7 +11,7 @@ GameObject:
   - component: {fileID: 422988}
   - component: {fileID: 3335220}
   - component: {fileID: 2313548}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tank_05_Wheel02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -158,7 +101,7 @@ GameObject:
   - component: {fileID: 415688}
   - component: {fileID: 3332136}
   - component: {fileID: 2393560}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tank_05_Wheel09
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -248,8 +191,9 @@ GameObject:
   - component: {fileID: 466634}
   - component: {fileID: 3311848}
   - component: {fileID: 2356118}
-  m_Layer: 0
-  m_Name: Tank_05_Body
+  - component: {fileID: 3496668575331164637}
+  m_Layer: 7
+  m_Name: Main Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -263,12 +207,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 109294}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0011659561, y: -0.013967859, z: 0.09948458}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.9290241, y: -0.013967859, z: -0.9603654}
   m_LocalScale: {x: 8.75, y: 8.75, z: 8.75}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 467198}
+  m_Father: {fileID: 6000346526762038062}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3311848
 MeshFilter:
@@ -327,6 +271,27 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &3496668575331164637
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 109294}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.60311687, y: 0.19307327, z: 1.0450025}
+  m_Center: {x: -0.000000002561137, y: 0, z: -0.0000000037252903}
 --- !u!1 &110744
 GameObject:
   m_ObjectHideFlags: 0
@@ -338,7 +303,7 @@ GameObject:
   - component: {fileID: 412028}
   - component: {fileID: 3336414}
   - component: {fileID: 2329868}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tank_05_Wheel05
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -428,7 +393,7 @@ GameObject:
   - component: {fileID: 496422}
   - component: {fileID: 3375882}
   - component: {fileID: 2341064}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tank_05_Wheel04
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -518,7 +483,7 @@ GameObject:
   - component: {fileID: 405972}
   - component: {fileID: 3351376}
   - component: {fileID: 2360842}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tank_05_Chain02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -608,7 +573,7 @@ GameObject:
   - component: {fileID: 431828}
   - component: {fileID: 3306832}
   - component: {fileID: 2385048}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tank_05_Wheel01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -698,8 +663,8 @@ GameObject:
   - component: {fileID: 403232}
   - component: {fileID: 3358572}
   - component: {fileID: 2316316}
-  m_Layer: 0
-  m_Name: Main_Gun_With_Body
+  m_Layer: 7
+  m_Name: Berrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -788,7 +753,7 @@ GameObject:
   - component: {fileID: 465134}
   - component: {fileID: 3378556}
   - component: {fileID: 2375006}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tank_05_Wheel03
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -878,7 +843,7 @@ GameObject:
   - component: {fileID: 488954}
   - component: {fileID: 3350852}
   - component: {fileID: 2340404}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tank_05_Wheel07
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -966,8 +931,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 451432}
-  m_Layer: 0
-  m_Name: Tank_05_UpperBody
+  - component: {fileID: 4994289775169557008}
+  m_Layer: 7
+  m_Name: Turret
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -981,15 +947,62 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 167522}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 1.2677454, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.2677454, z: 0}
   m_LocalScale: {x: 8.75, y: 8.75, z: 8.75}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 447356}
   - {fileID: 403232}
-  m_Father: {fileID: 467198}
+  - {fileID: 944507585424231910}
+  m_Father: {fileID: 495738}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4994289775169557008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 167522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 530016640397daf4fa90229fbb9961ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClientNetworkTransform
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkTransformExpanded: 1
+  AutoOwnerAuthorityTickOffset: 1
+  PositionInterpolationType: 0
+  RotationInterpolationType: 0
+  ScaleInterpolationType: 0
+  PositionLerpSmoothing: 1
+  PositionMaxInterpolationTime: 0.1
+  RotationLerpSmoothing: 1
+  RotationMaxInterpolationTime: 0.1
+  ScaleLerpSmoothing: 1
+  ScaleMaxInterpolationTime: 0.1
+  AuthorityMode: 0
+  TickSyncChildren: 0
+  UseUnreliableDeltas: 0
+  SyncPositionX: 0
+  SyncPositionY: 0
+  SyncPositionZ: 0
+  SyncRotAngleX: 0
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 0
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  SwitchTransformSpaceWhenParented: 0
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!1 &178698
 GameObject:
   m_ObjectHideFlags: 0
@@ -1001,7 +1014,7 @@ GameObject:
   - component: {fileID: 494908}
   - component: {fileID: 3338074}
   - component: {fileID: 2375838}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tank_05_Wheel06
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1091,7 +1104,7 @@ GameObject:
   - component: {fileID: 492780}
   - component: {fileID: 3318442}
   - component: {fileID: 2385688}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tank_05_Wheel10
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1179,8 +1192,16 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 495738}
-  m_Layer: 0
-  m_Name: Tank_05_Prefeb
+  - component: {fileID: 1195580757888152708}
+  - component: {fileID: 2471335915304261040}
+  - component: {fileID: 2248142679884838725}
+  - component: {fileID: 2617706488694047104}
+  - component: {fileID: 6035689857810472056}
+  - component: {fileID: 7871151270337233926}
+  - component: {fileID: 102621818273252061}
+  - component: {fileID: 274953673459162320}
+  m_Layer: 7
+  m_Name: Tank4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1196,12 +1217,205 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 467198}
+  - {fileID: 6000346526762038062}
+  - {fileID: 451432}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &1195580757888152708
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191448}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 116
+  m_CollisionDetection: 0
+--- !u!114 &2471335915304261040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2973ae2df606c364cb11cf8185f45f8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BrmnModules.Input.KeyboardMovementInput
+--- !u!114 &2248142679884838725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 1711948605
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &2617706488694047104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a67c03daa93a4428c3efca29e89e3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TankController
+  ShowTopMostFoldoutHeaderGroup: 1
+  moveSpeed: 5
+  rotateSpeed: 150
+--- !u!114 &6035689857810472056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abbaf19d7ee5b8a408b7e71af730fb33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TankShooter
+  ShowTopMostFoldoutHeaderGroup: 1
+  projectilePrefab: {fileID: 8030136784132672620, guid: dc73944edbee7ee49ab0989207d58047, type: 3}
+  firePoint: {fileID: 944507585424231910}
+  turret: {fileID: 451432}
+  barrelRenderer: {fileID: 2316316}
+  minSpeed: 4
+  maxSpeed: 6
+  maxChargeTime: 2
+  fireCoolTime: 1
+  overheatMaterials:
+  - {fileID: 2100000, guid: b18643c504675084f8056fa7c98a10f5, type: 2}
+  - {fileID: 2100000, guid: c2818acefc708de4189d40bc91899c45, type: 2}
+  - {fileID: 2100000, guid: 9ae40cd0021f6374cb97bf88acb35959, type: 2}
+  - {fileID: 2100000, guid: f8054cb59f9ff61498a59b25aa3c10ee, type: 2}
+  - {fileID: 2100000, guid: 0081d7825cd729d4085641c2107a69ef, type: 2}
+  maxHeat: 100
+  heatCooldownRate: 4
+  _overheatRanges:
+  - 25
+  - 50
+  - 75
+  - 100
+--- !u!114 &7871151270337233926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a45beaf2d6ba2a24399087548e11530a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TankHealth
+  ShowTopMostFoldoutHeaderGroup: 1
+  maxHp: 2
+  bodyRenderer: {fileID: 2356118}
+  damagedMaterial: {fileID: 2100000, guid: f8054cb59f9ff61498a59b25aa3c10ee, type: 2}
+--- !u!114 &102621818273252061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 530016640397daf4fa90229fbb9961ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClientNetworkTransform
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkTransformExpanded: 1
+  AutoOwnerAuthorityTickOffset: 1
+  PositionInterpolationType: 0
+  RotationInterpolationType: 0
+  ScaleInterpolationType: 0
+  PositionLerpSmoothing: 1
+  PositionMaxInterpolationTime: 0.1
+  RotationLerpSmoothing: 1
+  RotationMaxInterpolationTime: 0.1
+  ScaleLerpSmoothing: 1
+  ScaleMaxInterpolationTime: 0.1
+  AuthorityMode: 0
+  TickSyncChildren: 0
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 0
+  SyncPositionZ: 1
+  SyncRotAngleX: 0
+  SyncRotAngleY: 0
+  SyncRotAngleZ: 0
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  SwitchTransformSpaceWhenParented: 0
+  Interpolate: 1
+  SlerpPosition: 0
+--- !u!114 &274953673459162320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkRigidbody
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkRigidbodyBaseExpanded: 0
+  UseRigidBodyForMotion: 0
+  AutoUpdateKinematicState: 1
+  AutoSetKinematicOnDespawn: 1
 --- !u!1 &192868
 GameObject:
   m_ObjectHideFlags: 0
@@ -1213,8 +1427,8 @@ GameObject:
   - component: {fileID: 447356}
   - component: {fileID: 3317046}
   - component: {fileID: 2383698}
-  m_Layer: 0
-  m_Name: Upper_Body
+  m_Layer: 7
+  m_Name: Upper Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1301,8 +1515,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 454948}
-  m_Layer: 0
-  m_Name: Tank_05_Wheels
+  m_Layer: 7
+  m_Name: Wheels
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1316,8 +1530,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 196140}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: -0.13570216, z: 0.45073968}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.93019, y: -0.13570216, z: -0.6091103}
   m_LocalScale: {x: 8.75, y: 8.75, z: 8.75}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1333,7 +1547,7 @@ Transform:
   - {fileID: 414638}
   - {fileID: 415688}
   - {fileID: 492780}
-  m_Father: {fileID: 467198}
+  m_Father: {fileID: 6000346526762038062}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &196174
 GameObject:
@@ -1346,7 +1560,7 @@ GameObject:
   - component: {fileID: 400666}
   - component: {fileID: 3339394}
   - component: {fileID: 2301658}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tank_05_Chain01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1436,7 +1650,7 @@ GameObject:
   - component: {fileID: 414638}
   - component: {fileID: 3308544}
   - component: {fileID: 2390524}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tank_05_Wheel08
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1515,3 +1729,114 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &4116523361997324871
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 944507585424231910}
+  m_Layer: 7
+  m_Name: Fire Point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &944507585424231910
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4116523361997324871}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.14488518, z: 0.9142857}
+  m_LocalScale: {x: 0.114285715, y: 0.114285715, z: 0.114285715}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 451432}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6853124176270762576
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6000346526762038062}
+  - component: {fileID: 4402502633032068365}
+  m_Layer: 7
+  m_Name: Body
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6000346526762038062
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6853124176270762576}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.93019, y: 0, z: 1.05985}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 466634}
+  - {fileID: 454948}
+  m_Father: {fileID: 495738}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4402502633032068365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6853124176270762576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 530016640397daf4fa90229fbb9961ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClientNetworkTransform
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkTransformExpanded: 0
+  AutoOwnerAuthorityTickOffset: 1
+  PositionInterpolationType: 0
+  RotationInterpolationType: 0
+  ScaleInterpolationType: 0
+  PositionLerpSmoothing: 1
+  PositionMaxInterpolationTime: 0.1
+  RotationLerpSmoothing: 1
+  RotationMaxInterpolationTime: 0.1
+  ScaleLerpSmoothing: 1
+  ScaleMaxInterpolationTime: 0.1
+  AuthorityMode: 0
+  TickSyncChildren: 0
+  UseUnreliableDeltas: 0
+  SyncPositionX: 0
+  SyncPositionY: 0
+  SyncPositionZ: 0
+  SyncRotAngleX: 0
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 0
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  SwitchTransformSpaceWhenParented: 0
+  Interpolate: 1
+  SlerpPosition: 0

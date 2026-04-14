@@ -9,7 +9,6 @@ public class TankShooter : NetworkBehaviour
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private Transform firePoint;
     [SerializeField] private Transform turret;
-    [SerializeField] private Renderer turretRenderer;
     [SerializeField] private Renderer barrelRenderer;
 
     [Header("Projectile Variables")]
@@ -241,7 +240,6 @@ public class TankShooter : NetworkBehaviour
         if (index == _currentMaterialIndex) return;
         _currentMaterialIndex = index;
 
-        turretRenderer.material = overheatMaterials[index];
         barrelRenderer.material = overheatMaterials[index];
     }
 }

@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Project\Scripts\Managers\SpawnManager.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\TankSelectUI.cs" />
     <Compile Include="Assets\Project\Scripts\Managers\UGSManager.cs" />
     <Compile Include="Assets\Project\Scripts\Managers\MatchManager.cs" />
     <Compile Include="Assets\Project\Scripts\Modules\IMovementInput.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Assets\Project\Scripts\GamePlay\TankHealth.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\TankShooter.cs" />
     <Compile Include="Assets\Project\Scripts\Network\ClientNetworkTransform.cs" />
+    <Compile Include="Assets\Project\Scripts\Managers\TankSelectManager.cs" />
     <Compile Include="Assets\Project\Scripts\Modules\KeyboardMovementInput.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1045,6 +1045,82 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 758664813}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &783936695
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 783936698}
+  - component: {fileID: 783936696}
+  - component: {fileID: 783936697}
+  m_Layer: 0
+  m_Name: SelectManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &783936696
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 783936695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 3171822828
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &783936697
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 783936695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04be76d4016c135429169665113f5c2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TankSelectManager
+  ShowTopMostFoldoutHeaderGroup: 1
+  tankPrefabs:
+  - {fileID: 126358, guid: ed6cdb9b3238c418eb164458c6f1a28b, type: 3}
+  - {fileID: 181314, guid: 91b1c4c6da767da438c3daeea2b8e79b, type: 3}
+  - {fileID: 181314, guid: 87611ddf2b4a04e1f81acc90cbecbd09, type: 3}
+  - {fileID: 191448, guid: 5207a5f30f74a4f07a1b577bb2131063, type: 3}
+--- !u!4 &783936698
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 783936695}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &916164020
 GameObject:
   m_ObjectHideFlags: 0
@@ -1550,6 +1626,60 @@ Transform:
   - {fileID: 157416105}
   m_Father: {fileID: 17685359}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1567816978
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1567816980}
+  - component: {fileID: 1567816979}
+  m_Layer: 0
+  m_Name: SelectUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1567816979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1567816978}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 347db483f77d3b447b723fc111378e8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TankSelectUI
+  tankThumbnails:
+  - {fileID: 2800000, guid: 6ff7fd622e14e514fb45afcc4c503d19, type: 3}
+  - {fileID: 2800000, guid: 9ab2c1756c9b60040a0cbcf690f05319, type: 3}
+  - {fileID: 2800000, guid: 5695010be5f067641a740e4c8cc9b452, type: 3}
+  - {fileID: 2800000, guid: 474c8a79a3a940f48b3848849d43db61, type: 3}
+  tankNames:
+  - Green Tea
+  - Tteokbokki
+  - Bread
+  - Broccoli
+--- !u!4 &1567816980
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1567816978}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1600074744
 GameObject:
   m_ObjectHideFlags: 0
@@ -1715,7 +1845,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpawnManager
   ShowTopMostFoldoutHeaderGroup: 1
-  projectileParent: {fileID: 1745568251}
   spawnPoints:
   - {fileID: 662393296}
   - {fileID: 916164021}
@@ -1813,7 +1942,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 2082598877}
-    PlayerPrefab: {fileID: 126358, guid: ed6cdb9b3238c418eb164458c6f1a28b, type: 3}
+    PlayerPrefab: {fileID: 0}
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: 777c69253aba5a14189d77f44de15db4, type: 2}
@@ -1853,3 +1982,5 @@ SceneRoots:
   - {fileID: 2082598875}
   - {fileID: 1087191008}
   - {fileID: 141489271}
+  - {fileID: 783936698}
+  - {fileID: 1567816980}

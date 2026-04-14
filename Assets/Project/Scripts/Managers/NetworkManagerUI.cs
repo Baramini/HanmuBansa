@@ -17,6 +17,7 @@ public class NetworkManagerUI : MonoBehaviour
             {
                 _roomCode = code;
                 _statusMessage = $"Room created. Code: {code}";
+                FindFirstObjectByType<TankSelectUI>()?.Show();  // -- Show tank select --
             };
             MatchManager.Instance.OnMatchError += msg =>
             {
@@ -25,6 +26,7 @@ public class NetworkManagerUI : MonoBehaviour
             MatchManager.Instance.OnMatchStarted += () =>
             {
                 _statusMessage = "Connected!";
+                FindFirstObjectByType<TankSelectUI>()?.Show();  // -- Show tank select --
             };
         }
     }

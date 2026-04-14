@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class GameManager : NetworkBehaviour
 {
     public static GameManager Instance { get; private set; }
+    public event System.Action OnGameStarted;
     public bool IsGameStarted => _networkGameStarted.Value;
 
     [Header("Game Settings")]
@@ -86,7 +87,13 @@ public class GameManager : NetworkBehaviour
         _specialItemWarned = false;
         _specialItemSpawned = false;
 
-        Debug.Log("Game started.");
+        NotifyGameStartedClientRpc();
+    }
+
+    [ClientRpc]
+    private void NotifyGameStartedClientRpc()
+    {
+        OnGameStarted?.Invoke();
     }
 
     private void Update()
