@@ -80,7 +80,7 @@
     <Compile Include="Assets\Project\Scripts\Modules\KeyboardMovementInput.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Tiny Teacup Studio\Low Poly Desert Environment\LICENSE.txt" />
+    <None Include="Assets\Project\Asset_Maps\Tiny Teacup Studio\Low Poly Desert Environment\LICENSE.txt" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

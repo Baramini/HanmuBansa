@@ -81,6 +81,7 @@ public class Projectile : NetworkBehaviour
     {
         Vector3 inDirection = _lastVelocity.normalized;
         Vector3 reflected = Vector3.Reflect(inDirection, normal);
+        transform.rotation = Quaternion.LookRotation(reflected);
 
         reflected.y = 0f;
         reflected.Normalize();

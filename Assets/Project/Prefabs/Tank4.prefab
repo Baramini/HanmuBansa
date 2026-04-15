@@ -1316,7 +1316,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TankShooter
   ShowTopMostFoldoutHeaderGroup: 1
-  projectilePrefab: {fileID: 8030136784132672620, guid: dc73944edbee7ee49ab0989207d58047, type: 3}
+  projectilePrefab: {fileID: 7753991846644332940, guid: 14eec262c91623049aa5960b6e3a639e, type: 3}
   firePoint: {fileID: 944507585424231910}
   turret: {fileID: 451432}
   barrelRenderer: {fileID: 2316316}
