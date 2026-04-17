@@ -66,4 +66,14 @@ public class TankController : NetworkBehaviour
         Quaternion deltaRotation = Quaternion.Euler(0f, rotate, 0f);
         _rb.MoveRotation(_rb.rotation * deltaRotation);
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        // -- Cancel any velocity gained from wall collision --
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Wall"))
+        {
+            _rb.linearVelocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
+        }
+    }
 }

@@ -11,6 +11,9 @@ public class Projectile : NetworkBehaviour
     private Vector3 _lastVelocity;
     private bool _isReturned = false;
 
+    private float _reflectCooldown = 0f;
+    private const float REFLECT_INTERVAL = 0.02f; // cooltime
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
@@ -47,6 +50,9 @@ public class Projectile : NetworkBehaviour
     {
         if (!IsServer) return;
         _lastVelocity = _rb.linearVelocity;
+
+        if (_reflectCooldown > 0f)
+            _reflectCooldown -= Time.fixedDeltaTime;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -58,7 +64,13 @@ public class Projectile : NetworkBehaviour
 
         if (hit.layer == LayerMask.NameToLayer("Wall"))
         {
-            Reflect(collision.GetContact(0).normal);
+            if (_reflectCooldown > 0f) return;
+
+            Vector3 normal = collision.GetContact(0).normal;
+
+            Reflect(normal);
+            _reflectCooldown = REFLECT_INTERVAL;
+
             return;
         }
 
