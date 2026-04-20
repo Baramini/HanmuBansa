@@ -103,6 +103,10 @@ public class GameManager : NetworkBehaviour
         if (!_networkGameStarted.Value) return;
         if (_gameEnded) return;
 
+        // -- Stop if network disconnected --
+        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)
+            return;
+
         _networkTimer.Value += Time.deltaTime;
         float remaining = gameDuration - _networkTimer.Value;
 
@@ -146,6 +150,14 @@ public class GameManager : NetworkBehaviour
         if (_gameEnded) return;
         _gameEnded = true;
         EndGameClientRpc(winnerName);
+    }
+
+    public void ResetGame()
+    {
+        if (!IsServer) return;
+        _networkGameStarted.Value = false;
+        _networkTimer.Value = 0f;
+        _gameEnded = false;
     }
 
     [ClientRpc]

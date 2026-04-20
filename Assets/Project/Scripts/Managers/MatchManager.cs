@@ -160,6 +160,10 @@ public class MatchManager : NetworkBehaviour
     {
         try
         {
+            // -- Reset game state --
+            if (GameManager.Instance != null)
+                GameManager.Instance.ResetGame();
+                
             // -- Stop heartbeat --
             if (_heartbeatCoroutine != null)
                 StopCoroutine(_heartbeatCoroutine);
@@ -273,7 +277,7 @@ public class MatchManager : NetworkBehaviour
             (ushort)joinAllocation.RelayServer.Port,
             joinAllocation.AllocationIdBytes,
             joinAllocation.ConnectionData,
-            joinAllocation.HostConnectionData,  // -- Client: hostConnectionData µû·Î ÀÖÀ½ --
+            joinAllocation.HostConnectionData,  // -- Client: hostConnectionData ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ --
             joinAllocation.Key,
             connectionType == "dtls"
         );
