@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
+using BrmnModules.UI;
 
 public class GameManager : NetworkBehaviour
 {
@@ -51,8 +52,20 @@ public class GameManager : NetworkBehaviour
     {
         if (!IsServer) return;
         // -- Subscribe on all clients for HUD updates --
-        _networkTimer.OnValueChanged += (prev, cur) => OnTimerChanged?.Invoke(cur);
-        _networkAliveCount.OnValueChanged += (prev, cur) => OnAliveCountChanged?.Invoke(cur);
+        _networkTimer.OnValueChanged += (prev, cur) =>
+        {
+            OnTimerChanged?.Invoke(cur);
+            UIManager.Instance?.GetPersistent<HUD>()?.SetTimer(gameDuration - cur);
+        };
+        _networkAliveCount.OnValueChanged += (prev, cur) =>
+        {
+            OnAliveCountChanged?.Invoke(cur);
+            UIManager.Instance?.GetPersistent<HUD>()?.SetAliveCount(cur);
+        };
+
+        // Late-joining client needs initial values
+        UIManager.Instance?.GetPersistent<HUD>()?.SetTimer(gameDuration - _networkTimer.Value);
+        UIManager.Instance?.GetPersistent<HUD>()?.SetAliveCount(_networkAliveCount.Value);
     }
 
     public override void OnNetworkDespawn()

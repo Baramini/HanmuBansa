@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
 using BrmnModules.Pool;
+using BrmnModules.UI;
 
 public class TankShooter : NetworkBehaviour
 {
@@ -24,6 +25,7 @@ public class TankShooter : NetworkBehaviour
     [SerializeField] private float[] _overheatRanges;
 
     public float ChargeRatio => _chargeTime / maxChargeTime;
+    public float HeatRatio => _localHeat / maxHeat;
 
     // -- NetworkVariable: synced across all clients automatically --
     // Server writes, all clients read
@@ -128,6 +130,11 @@ public class TankShooter : NetworkBehaviour
 
         // -- Handle overheat timer locally --
         HandleOverheatTimer();
+
+        // -- Update HUD --
+        UIManager.Instance?.GetPersistent<HUD>()?.SetChargeRatio(ChargeRatio);
+        UIManager.Instance?.GetPersistent<HUD>()?.SetHeatRatio(HeatRatio);
+        UIManager.Instance?.GetPersistent<HUD>()?.SetOverheated(_localIsOverheated);
     }
 
     private void HandleOverheatTimer()
