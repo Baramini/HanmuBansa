@@ -1,14 +1,14 @@
-using BrmnModules.UI;
-using TMPro;
 using UnityEngine;
+using TMPro;
+using BrmnModules.UI;
 
 public class ResultPopup : PopupUI
 {
-    [SerializeField] private TextMeshProUGUI winnerText;
+    [SerializeField] private TextMeshProUGUI resultText;
 
-    public void Show(string winnerName)
+    // -- Override Show --
+    public void SetResult(string winnerName)
     {
-        winnerText.text = winnerName == "Draw" ? "DRAW!" : $"Winner: {winnerName}";
-        base.Show();
+        if (resultText != null) resultText.text = winnerName == "" ? "DRAW!" : $"Player {winnerName} Win!!!";
     }
 }

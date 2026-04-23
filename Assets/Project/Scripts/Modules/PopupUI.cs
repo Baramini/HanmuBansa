@@ -64,5 +64,10 @@ namespace BrmnModules.UI
             canvasGroup.alpha = to;
             onComplete?.Invoke();
         }
+
+        public virtual void OnCloseButton()
+        {
+            UIManager.Instance?.HidePopup(this);
+        }
     }
 }

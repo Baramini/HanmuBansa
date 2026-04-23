@@ -153,7 +153,7 @@ public class GameManager : NetworkBehaviour
         {
             // -- Find winner --
             TankHealth winner = _tanks.Find(t => !t.IsDead);
-            string winnerName = winner != null ? winner.name : "Unknown";
+            string winnerName = winner != null ? winner.name : "";
             EndGame(winnerName);
         }
     }
@@ -204,8 +204,13 @@ public class GameManager : NetworkBehaviour
     {
         _gameEnded = true;
         OnGameEnd?.Invoke(winnerName);
+
+        UIManager.Instance?.ShowPopup<ResultPopup>(panel =>
+        {
+            panel.SetResult(winnerName);
+        });
+
         Time.timeScale = 0f;
-        Debug.Log($"Game over. Winner: {winnerName}");
     }
 
     // -- Utility: remaining time in seconds --

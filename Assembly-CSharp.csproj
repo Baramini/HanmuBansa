@@ -80,9 +80,13 @@
     <Compile Include="Assets\Project\Scripts\GamePlay\Item\ItemPickup.cs" />
     <Compile Include="Assets\Project\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Item\AirStrikeItem.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\SettingsPopup.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\MultiPlayPopup.cs" />
     <Compile Include="Assets\Project\Scripts\Modules\PoolManager.cs" />
     <Compile Include="Assets\Project\Scripts\Managers\NetworkManagerUI.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\MainSceneUI.cs" />
     <Compile Include="Assets\Project\PlayerInputActions.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\SinglePlayPopup.cs" />
     <Compile Include="Assets\Project\Scripts\Modules\PersistentUI.cs" />
     <Compile Include="Assets\Project\Scripts\UI\HUD.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />

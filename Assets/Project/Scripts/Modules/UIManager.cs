@@ -51,12 +51,14 @@ namespace BrmnModules.UI
         // -- Popup API ------------------------------------------
         // -------------------------------------------------------
 
-        public void ShowPopup<T>() where T : PopupUI
+        public void ShowPopup<T>(System.Action<T> onBeforeShow = null) where T : PopupUI
         {
             T popup = GetPopup<T>();
             if (popup == null) return;
 
-            // -- Show backdrop if first popup --
+            // -- Action before show --
+            onBeforeShow?.Invoke(popup);
+
             if (_popupStack.Count == 0 && backdrop != null)
                 backdrop.SetActive(true);
 
@@ -76,6 +78,14 @@ namespace BrmnModules.UI
             popup.Hide();
 
             // -- Hide backdrop if no more popups --
+            if (_popupStack.Count == 0 && backdrop != null)
+                backdrop.SetActive(false);
+        }
+        public void HidePopup(PopupUI popup)
+        {
+            RemoveFromStack(popup);
+            popup.Hide();
+
             if (_popupStack.Count == 0 && backdrop != null)
                 backdrop.SetActive(false);
         }
