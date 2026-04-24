@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Map_Spaceship_Warehouse.unity
     guid: 1eb2f42dc029ac345bd0bfb0821d6e86
+  - enabled: 1
+    path: Assets/Scenes/Main.unity
+    guid: 4781bc47fc4345049a5521af55ef6a18
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

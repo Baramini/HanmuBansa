@@ -121,7 +121,7 @@ namespace BrmnModules.UI
         // -- Internal -------------------------------------------
         // -------------------------------------------------------
 
-        private T GetPopup<T>() where T : PopupUI
+        public T GetPopup<T>() where T : PopupUI
         {
             System.Type type = typeof(T);
 

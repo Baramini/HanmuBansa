@@ -72,9 +72,11 @@
     <Compile Include="Assets\Project\Scripts\UI\TankSelectUI.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Item\ItemBase.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Tank\TankStatus.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\ErrorMessagePopup.cs" />
     <Compile Include="Assets\Project\Scripts\Managers\UGSManager.cs" />
     <Compile Include="Assets\Project\Scripts\Managers\MatchManager.cs" />
     <Compile Include="Assets\Project\Scripts\Modules\IMovementInput.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\StatusMessagePopup.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Tank\TankHealth.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Item\BoosterItem.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Item\ItemPickup.cs" />
@@ -92,6 +94,7 @@
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Tank\TankShooter.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Item\ItemSpawner.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\PlayerNamePopup.cs" />
     <Compile Include="Assets\Project\Scripts\UI\SafeAreaFitter.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Item\ShieldItem.cs" />
     <Compile Include="Assets\Project\Scripts\Modules\BaseUI.cs" />

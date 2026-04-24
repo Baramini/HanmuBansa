@@ -29,7 +29,10 @@ public class UGSManager : MonoBehaviour
         if (!AuthenticationService.Instance.IsSignedIn)
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
 
+        // -- Set player name after sign in --
+        string playerName = PlayerPrefs.GetString("PlayerName", "Player");
+        await AuthenticationService.Instance.UpdatePlayerNameAsync(playerName);
+
         IsInitialized = true;
-        Debug.Log($"UGS ready. PlayerID: {AuthenticationService.Instance.PlayerId}");
     }
 }
