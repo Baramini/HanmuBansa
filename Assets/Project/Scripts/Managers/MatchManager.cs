@@ -9,6 +9,7 @@ using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
 using System.Collections;
 using System.Collections.Generic;
+using BrmnModules.UI;
 
 // Manages room creation, joining, and auto-matching.
 // Uses UGS Lobby + Relay for P2P connection without dedicated server.
@@ -20,10 +21,32 @@ public class MatchManager : NetworkBehaviour
     private const int MAX_PLAYERS = 4;
 
     // -- Lobby data key for storing Relay join code --
-    private const string RELAY_CODE_KEY = "RelayCode";
+    public string CurrentLobbyCode => _currentLobby?.LobbyCode ?? "";
+    public Unity.Services.Lobbies.Models.Lobby CurrentLobby => _currentLobby;
 
+    private const string RELAY_CODE_KEY = "RelayCode";
     private Lobby _currentLobby;
     private Coroutine _heartbeatCoroutine;
+    private bool _isLeavingIntentionally = false;
+
+    private Dictionary<string, PlayerDataObject> GetLocalPlayerData()
+    {
+        return new Dictionary<string, PlayerDataObject>
+        {
+            { "PlayerName", new PlayerDataObject(
+                PlayerDataObject.VisibilityOptions.Member,
+                PlayerPrefs.GetString("PlayerName", "Player")) },
+            { "Wins", new PlayerDataObject(
+                PlayerDataObject.VisibilityOptions.Member,
+                RecordManager.Instance?.Wins.ToString() ?? "0") },
+            { "Losses", new PlayerDataObject(
+                PlayerDataObject.VisibilityOptions.Member,
+                RecordManager.Instance?.Losses.ToString() ?? "0") },
+            { "Draws", new PlayerDataObject(
+                PlayerDataObject.VisibilityOptions.Member,
+                RecordManager.Instance?.Draws.ToString() ?? "0") },
+        };
+    }
 
     // -- Events for UI --
     public event System.Action<string> OnMatchError;
@@ -34,6 +57,10 @@ public class MatchManager : NetworkBehaviour
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
+    }
+    private void Start()
+    {
+        NetworkManager.Singleton.OnClientStopped += OnClientStopped;
     }
 
     // -------------------------------------------------------
@@ -56,7 +83,8 @@ public class MatchManager : NetworkBehaviour
                 Data = new Dictionary<string, DataObject>
                 {
                     { RELAY_CODE_KEY, new DataObject(DataObject.VisibilityOptions.Public, relayCode) }
-                }
+                },
+                Player = new Player(data: GetLocalPlayerData())
             };
 
             _currentLobby = await LobbyService.Instance.CreateLobbyAsync(
@@ -93,7 +121,11 @@ public class MatchManager : NetworkBehaviour
         try
         {
             // -- 1. Join Lobby by code --
-            _currentLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode.ToUpper());
+            JoinLobbyByCodeOptions joinOptions = new JoinLobbyByCodeOptions
+            {
+                Player = new Player(data: GetLocalPlayerData())
+            };
+            _currentLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode.ToUpper(), joinOptions);
 
             // -- 2. Get Relay join code from Lobby data --
             string relayCode = _currentLobby.Data[RELAY_CODE_KEY].Value;
@@ -154,10 +186,58 @@ public class MatchManager : NetworkBehaviour
     }
 
     // -------------------------------------------------------
+    // -- SELECT MAP -----------------------------------------
+    // -------------------------------------------------------
+
+    private const string MAP_KEY = "SelectedMap";
+
+    // -- Update lobby data with selected map --
+    public async Task SetSelectedMapAsync(int mapIndex)
+    {
+        if (_currentLobby == null) return;
+
+        try
+        {
+            UpdateLobbyOptions options = new UpdateLobbyOptions
+            {
+                Data = new Dictionary<string, DataObject>
+            {
+                // -- Keep existing relay code --
+                { RELAY_CODE_KEY, new DataObject(
+                    DataObject.VisibilityOptions.Public,
+                    _currentLobby.Data[RELAY_CODE_KEY].Value) },
+                // -- Add map index --
+                { MAP_KEY, new DataObject(
+                    DataObject.VisibilityOptions.Member,
+                    mapIndex.ToString()) }
+            }
+            };
+
+            _currentLobby = await LobbyService.Instance
+                .UpdateLobbyAsync(_currentLobby.Id, options);
+
+            Debug.Log($"Map set to index: {mapIndex}");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"SetSelectedMap error: {e.Message}");
+        }
+    }
+
+    public int GetSelectedMapIndex()
+    {
+        if (_currentLobby?.Data == null) return 0;
+        if (!_currentLobby.Data.ContainsKey(MAP_KEY)) return 0;
+        return int.Parse(_currentLobby.Data[MAP_KEY].Value);
+    }
+
+    // -------------------------------------------------------
     // -- LEAVE ROOM -----------------------------------------
     // -------------------------------------------------------
     public async Task LeaveRoomAsync()
     {
+        _isLeavingIntentionally = true;
+
         try
         {
             // -- Reset game state --
@@ -205,37 +285,65 @@ public class MatchManager : NetworkBehaviour
         }
     }
 
-    public override void OnNetworkSpawn()
-    {
-        if (!IsServer) return;
+    //public override void OnNetworkSpawn()
+    //{
+    //    //if (!IsServer) return;
 
-        // -- Watch for player connections --
-        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedForGame;
-        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectedForGame;
+    //    // -- Watch for player connections --
+    //    NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectedForGame;
+    //}
+
+    //public override void OnNetworkDespawn()
+    //{
+    //    //if (!IsServer) return;
+
+    //    NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnectedForGame;
+    //}
+
+    private void OnClientStopped(bool isHost)
+    {
+        if (isHost) return;
+
+        // -- Ignore if leaving intentionally --
+        if (_isLeavingIntentionally)
+        {
+            _isLeavingIntentionally = false;
+            return;
+        }
+
+        _ = ForceLeaveAsync();
     }
 
-    public override void OnNetworkDespawn()
+    private async System.Threading.Tasks.Task ForceLeaveAsync()
     {
-        if (!IsServer) return;
+        if (_currentLobby != null)
+        {
+            try
+            {
+                string playerId = Unity.Services.Authentication
+                    .AuthenticationService.Instance.PlayerId;
+                await LobbyService.Instance
+                    .RemovePlayerAsync(_currentLobby.Id, playerId);
+            }
+            catch (LobbyServiceException)
+            {
+                Debug.Log("Lobby already deleted by host.");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"ForceLeave lobby error: {e.Message}");
+            }
+            _currentLobby = null;
+        }
 
-        NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnectedForGame;
-        NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnectedForGame;
-    }
+        if (NetworkManager.Singleton.IsConnectedClient ||
+            NetworkManager.Singleton.IsListening)
+            NetworkManager.Singleton.Shutdown();
 
-    private void OnClientConnectedForGame(ulong clientId)
-    {
-        if (!IsServer) return;
+        UIManager.Instance?.ShowPopup<ErrorMessagePopup>(p =>
+            p.ShowMessage("Host has disconnected."));
 
-        int playerCount = NetworkManager.Singleton.ConnectedClients.Count;
-        Debug.Log($"Player connected. Total: {playerCount}");
-
-        // -- No auto start: host manually starts game --
-    }
-
-    private void OnClientDisconnectedForGame(ulong clientId)
-    {
-        if (!IsServer) return;
-        Debug.Log("Player disconnected.");
+        UIManager.Instance?.HidePopup<LobbyPopup>();
     }
 
     // -- Called by host start button --
@@ -244,16 +352,76 @@ public class MatchManager : NetworkBehaviour
         if (!IsServer) return;
 
         int playerCount = NetworkManager.Singleton.ConnectedClients.Count;
-
         if (playerCount < 2)
         {
             Debug.Log("Need at least 2 players to start.");
             return;
         }
 
-        // -- Spawn players first, then start game --
-        FindFirstObjectByType<SpawnManager>()?.SpawnAllPlayers();
-        GameManager.Instance.StartGame();
+        // -- Check all players have selected a tank --
+        if (!TankSelectManager.Instance.AllPlayersSelected())
+        {
+            Debug.Log("Not all players have selected a tank.");
+            return;
+        }
+
+        ShowLoadingClientRpc();
+        StartCoroutine(LoadSceneAfterDelayCoroutine());
+    }
+
+    private IEnumerator LoadSceneAfterDelayCoroutine()
+    {
+        // -- Wait for loading panel to appear --
+        yield return new WaitForSeconds(1.5f);
+
+        int mapIndex = GetSelectedMapIndex();
+        int sceneIndex = mapIndex + 1;
+        NetworkManager.Singleton.SceneManager.OnLoadComplete += OnMapSceneLoaded;
+        NetworkManager.Singleton.SceneManager.LoadScene(
+            System.IO.Path.GetFileNameWithoutExtension(
+                UnityEngine.SceneManagement.SceneUtility
+                    .GetScenePathByBuildIndex(sceneIndex)),
+            UnityEngine.SceneManagement.LoadSceneMode.Single
+        );
+    }
+
+    [ClientRpc]
+    private void ShowLoadingClientRpc()
+    {
+        UIManager.Instance?.ShowPopup<LoadingPopup>();
+        UIManager.Instance?.HidePopup<LobbyPopup>();
+    }
+
+    private void OnMapSceneLoaded(ulong clientId, string sceneName,
+    UnityEngine.SceneManagement.LoadSceneMode loadSceneMode)
+    {
+        Debug.Log($"OnMapSceneLoaded clientId:{clientId} sceneName:{sceneName}");
+
+        if (!IsServer) return;
+        if (clientId != NetworkManager.Singleton.LocalClientId) return;
+
+        NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnMapSceneLoaded;
+
+        NetworkManager.Singleton.SceneManager.OnLoadComplete += OnEachClientLoaded;
+        NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += OnLoadEventCompleted;
+    }
+
+    private void OnEachClientLoaded(ulong clientId, string sceneName,
+    UnityEngine.SceneManagement.LoadSceneMode loadSceneMode)
+    {
+        Debug.Log($"Client {clientId} finished loading {sceneName}");
+        Debug.Log($"Total connected: {NetworkManager.Singleton.ConnectedClients.Count}");
+    }
+
+    private void OnLoadEventCompleted(string sceneName,
+    UnityEngine.SceneManagement.LoadSceneMode loadSceneMode,
+    System.Collections.Generic.List<ulong> clientsCompleted,
+    System.Collections.Generic.List<ulong> clientsTimedOut)
+    {
+        NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= OnLoadEventCompleted;
+        var spawnManager = FindFirstObjectByType<SpawnManager>();
+        spawnManager?.SpawnAllPlayers();
+        GameManager.Instance?.StartGame();
     }
 
     private RelayServerData GetHostRelayData(Allocation allocation, string connectionType)
@@ -277,7 +445,7 @@ public class MatchManager : NetworkBehaviour
             (ushort)joinAllocation.RelayServer.Port,
             joinAllocation.AllocationIdBytes,
             joinAllocation.ConnectionData,
-            joinAllocation.HostConnectionData,  // -- Client: hostConnectionData ���� ���� --
+            joinAllocation.HostConnectionData,
             joinAllocation.Key,
             connectionType == "dtls"
         );
@@ -286,6 +454,17 @@ public class MatchManager : NetworkBehaviour
     public override void OnDestroy()
     {
         // -- Release Relay/Lobby on app quit --
+        if (NetworkManager.Singleton != null)
+            NetworkManager.Singleton.OnClientStopped -= OnClientStopped;
+
+        if (NetworkManager.Singleton != null &&
+        NetworkManager.Singleton.IsListening)
+        {
+            base.OnDestroy();
+            return;
+        }
+
         _ = LeaveRoomAsync();
+        base.OnDestroy();
     }
 }

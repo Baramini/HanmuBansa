@@ -252,7 +252,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 15613105}
   m_CullTransparentMesh: 1
---- !u!1 &74475753
+--- !u!1 &126151844
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -260,47 +260,46 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 74475755}
-  - component: {fileID: 74475754}
+  - component: {fileID: 126151846}
+  - component: {fileID: 126151845}
   m_Layer: 0
-  m_Name: SelectUI
+  m_Name: DataContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &74475754
+--- !u!114 &126151845
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 74475753}
+  m_GameObject: {fileID: 126151844}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 347db483f77d3b447b723fc111378e8d, type: 3}
+  m_Script: {fileID: 11500000, guid: a76e8a8648b5f71469be1b4f9c50ee0e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TankSelectUI
-  tankThumbnails:
-  - {fileID: 2800000, guid: 6ff7fd622e14e514fb45afcc4c503d19, type: 3}
-  - {fileID: 2800000, guid: 9ab2c1756c9b60040a0cbcf690f05319, type: 3}
-  - {fileID: 2800000, guid: 5695010be5f067641a740e4c8cc9b452, type: 3}
-  - {fileID: 2800000, guid: 474c8a79a3a940f48b3848849d43db61, type: 3}
-  tankNames:
-  - Green Tea
-  - Tteokbokki
-  - Bread
-  - Broccoli
---- !u!4 &74475755
+  m_EditorClassIdentifier: Assembly-CSharp::TankSpriteContainer
+  entries:
+  - key: 0
+    sprite: {fileID: 21300000, guid: 6ff7fd622e14e514fb45afcc4c503d19, type: 3}
+  - key: 1
+    sprite: {fileID: 21300000, guid: 9ab2c1756c9b60040a0cbcf690f05319, type: 3}
+  - key: 2
+    sprite: {fileID: 21300000, guid: 5695010be5f067641a740e4c8cc9b452, type: 3}
+  - key: 3
+    sprite: {fileID: 21300000, guid: 474c8a79a3a940f48b3848849d43db61, type: 3}
+--- !u!4 &126151846
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 74475753}
+  m_GameObject: {fileID: 126151844}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -507,6 +506,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 263308633}
   m_CullTransparentMesh: 1
+--- !u!1 &397293069
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 397293071}
+  - component: {fileID: 397293070}
+  m_Layer: 0
+  m_Name: PlayerRecordManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &397293070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 397293069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97a83865835149a4c980108983bb7408, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RecordManager
+--- !u!4 &397293071
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 397293069}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &449328413
 GameObject:
   m_ObjectHideFlags: 0
@@ -795,7 +838,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 598219281}
-  - component: {fileID: 598219280}
   - component: {fileID: 598219279}
   - component: {fileID: 598219278}
   m_Layer: 0
@@ -877,18 +919,6 @@ MonoBehaviour:
     OldPrefabList: []
   RunInBackground: 1
   LogLevel: 1
---- !u!114 &598219280
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 598219277}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 758b721463cda8849be5aa43ce842ff4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NetworkManagerUI
 --- !u!4 &598219281
 Transform:
   m_ObjectHideFlags: 0
@@ -1082,6 +1112,9 @@ MonoBehaviour:
   - {fileID: 5168267181158454993, guid: ba8cab000af68d34cb74bf2049ccf5cf, type: 3}
   - {fileID: 879620225595335326, guid: a762d91536c5a82479883278bc05070e, type: 3}
   - {fileID: 8751562182023834045, guid: 5aab04af11e7f6843a49c0671bb9111e, type: 3}
+  - {fileID: 5683452892430718950, guid: a9c2c34368ba1b74795d1681940051e9, type: 3}
+  - {fileID: 8460814381334624242, guid: 06d3d92e021b47e44a10e6ae4784d17e, type: 3}
+  - {fileID: 9023515230239686308, guid: 2e50a98f217fa04408f40006a6694c58, type: 3}
   popupRoot: {fileID: 154444563}
   backdrop: {fileID: 461356062}
 --- !u!114 &828844297
@@ -2178,7 +2211,7 @@ Transform:
   m_GameObject: {fileID: 1745747829}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.4952, y: -0, z: 1.58635}
+  m_LocalPosition: {x: 0, y: -0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2419,7 +2452,8 @@ SceneRoots:
   - {fileID: 1171911505}
   - {fileID: 1237544849}
   - {fileID: 987225643}
-  - {fileID: 74475755}
   - {fileID: 1311995046}
   - {fileID: 1745747830}
   - {fileID: 1262980471}
+  - {fileID: 397293071}
+  - {fileID: 126151846}

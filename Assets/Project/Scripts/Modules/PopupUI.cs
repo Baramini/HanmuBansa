@@ -37,6 +37,12 @@ namespace BrmnModules.UI
 
         public virtual void Hide()
         {
+            if (!gameObject.activeInHierarchy)
+            {
+                gameObject.SetActive(false);
+                return;
+            }
+
             if (_fadeCoroutine != null)
                 StopCoroutine(_fadeCoroutine);
 

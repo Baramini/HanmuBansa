@@ -111,10 +111,16 @@ public class TankSelectManager : NetworkBehaviour
     // -- Check if all connected clients have selected --
     public bool AllPlayersSelected()
     {
-        foreach (var clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            if (!_selections.ContainsKey(clientId)) return false;
+            if (!_selections.ContainsKey(clientId))
+                return false;
         }
-        return true;
+        return NetworkManager.Singleton.ConnectedClientsIds.Count > 0;
+    }
+
+    public int GetSelectionByClientId(ulong clientId)
+    {
+        return _selections.TryGetValue(clientId, out int index) ? index : -1;
     }
 }

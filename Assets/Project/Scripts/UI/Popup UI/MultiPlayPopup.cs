@@ -78,9 +78,13 @@ public class MultiplayPopup : PopupUI
 
     private void OnRoomCodeGenerated(string code)
     {
-        // -- Update existing status message --
         UIManager.Instance?.GetPopup<StatusMessagePopup>()
-            ?.ShowMessage($"Room Code: {code}", 10f);
+            ?.ShowMessage($"Room Code: {code}", 1f, onClose: () =>
+            {
+                // -- Move to lobby after showing code --
+                UIManager.Instance?.HidePopup<MultiplayPopup>();
+                UIManager.Instance?.ShowPopup<LobbyPopup>();
+            });
     }
 
     private void OnMatchError(string msg)
@@ -93,9 +97,11 @@ public class MultiplayPopup : PopupUI
     private void OnMatchStarted()
     {
         UIManager.Instance?.GetPopup<StatusMessagePopup>()
-            ?.ShowMessage("Connected!", 1.5f, onClose: () =>
+            ?.ShowMessage("Connected!", 1f, onClose: () =>
             {
-                // -- TODO: transition to lobby panel --
+                // -- Close multiplayer panel, open lobby --
+                UIManager.Instance?.HidePopup<MultiplayPopup>();
+                UIManager.Instance?.ShowPopup<LobbyPopup>();
             });
     }
 

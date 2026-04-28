@@ -50,7 +50,6 @@ public class GameManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (!IsServer) return;
         // -- Subscribe on all clients for HUD updates --
         _networkTimer.OnValueChanged += (prev, cur) =>
         {
@@ -80,15 +79,11 @@ public class GameManager : NetworkBehaviour
     public void SetPlayer(TankHealth tank)
     {
         if (!IsServer) return;
-
         _tanks.Add(tank);
         _networkAliveCount.Value = _tanks.Count;
         tank.OnDead += () => OnTankDead(tank);
-
-        Debug.Log($"Player registered. Count: {_tanks.Count}");
     }
 
-    // -- Called by host to start game --
     public void StartGame()
     {
         if (!IsServer) return;
@@ -106,7 +101,16 @@ public class GameManager : NetworkBehaviour
     [ClientRpc]
     private void NotifyGameStartedClientRpc()
     {
+        // -- Hide loading panel when game actually starts --
+        UIManager.Instance?.HidePopup<LoadingPopup>();
         OnGameStarted?.Invoke();
+    }
+
+    [ClientRpc]
+    private void NotifyGameStartedClientRpc(int mapIndex)
+    {
+        OnGameStarted?.Invoke();
+        
     }
 
     private void Update()
@@ -203,14 +207,20 @@ public class GameManager : NetworkBehaviour
     private void EndGameClientRpc(string winnerName)
     {
         _gameEnded = true;
+        Time.timeScale = 0f;
         OnGameEnd?.Invoke(winnerName);
+
+        bool isDraw = winnerName == "Draw";
+        bool isWinner = !isDraw && winnerName == PlayerPrefs.GetString("PlayerName", "");
+
+        if (isDraw) RecordManager.Instance?.RecordDraw();
+        else if (isWinner) RecordManager.Instance?.RecordWin();
+        else RecordManager.Instance?.RecordLoss();
 
         UIManager.Instance?.ShowPopup<ResultPopup>(panel =>
         {
             panel.SetResult(winnerName);
         });
-
-        Time.timeScale = 0f;
     }
 
     // -- Utility: remaining time in seconds --

@@ -27,6 +27,10 @@ public class TankShooter : NetworkBehaviour
     public float ChargeRatio => _chargeTime / maxChargeTime;
     public float HeatRatio => _localHeat / maxHeat;
 
+    private float _lastSyncedHeat = -1f;
+    private bool _lastSyncedOverheated = false;
+    private const float HEAT_SYNC_THRESHOLD = 1f;
+
     // -- NetworkVariable: synced across all clients automatically --
     // Server writes, all clients read
     private NetworkVariable<float> _networkHeat = new NetworkVariable<float>(
@@ -51,6 +55,8 @@ public class TankShooter : NetworkBehaviour
     private float _fireCoolTimer;
     private bool _isCharging;
 
+    private HUD _hud;
+
     private Transform projectileParent;
     private PlayerInputActions _inputActions;
     private Camera _mainCamera;
@@ -62,8 +68,6 @@ public class TankShooter : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        // -- Subscribe to NetworkVariable changes on all clients --
-        // This updates visuals whenever heat value changes
         _networkHeat.OnValueChanged += OnHeatChanged;
         _networkIsOverheated.OnValueChanged += OnOverheatedChanged;
 
@@ -71,6 +75,9 @@ public class TankShooter : NetworkBehaviour
 
         _inputActions = new PlayerInputActions();
         _mainCamera = Camera.main;
+
+        // -- Cache HUD reference --
+        _hud = UIManager.Instance?.GetPersistent<HUD>();
 
         _inputActions.Player.Fire.Enable();
         _inputActions.Player.Fire.started += OnFireStarted;
@@ -105,9 +112,7 @@ public class TankShooter : NetworkBehaviour
 
     private void Update()
     {
-        // -- Only owner handles input --
         if (!IsOwner) return;
-
         if (GameManager.Instance == null || !GameManager.Instance.IsGameStarted) return;
 
         HandleAim();
@@ -118,23 +123,16 @@ public class TankShooter : NetworkBehaviour
         if (_isCharging)
             _chargeTime = Mathf.Min(_chargeTime + Time.deltaTime, maxChargeTime);
 
-        // -- Local cooldown for immediate UI response --
         if (!_localIsOverheated && _localHeat > 0f)
             _localHeat = Mathf.Max(0f, _localHeat - heatCooldownRate * Time.deltaTime);
 
-        // -- Sync local heat to server --
-        if (IsServer)
-            UpdateHeatOnServer(_localHeat, _localIsOverheated);
-        else
-            SyncHeatServerRpc(_localHeat, _localIsOverheated);
-
-        // -- Handle overheat timer locally --
+        SyncHeatIfNeeded();
         HandleOverheatTimer();
 
-        // -- Update HUD --
-        UIManager.Instance?.GetPersistent<HUD>()?.SetChargeRatio(ChargeRatio);
-        UIManager.Instance?.GetPersistent<HUD>()?.SetHeatRatio(HeatRatio);
-        UIManager.Instance?.GetPersistent<HUD>()?.SetOverheated(_localIsOverheated);
+        // -- Use cached HUD reference --
+        _hud?.SetChargeRatio(ChargeRatio);
+        _hud?.SetHeatRatio(HeatRatio);
+        //UIManager.Instance?.GetPersistent<HUD>()?.SetOverheated(_localIsOverheated);
     }
 
     private void HandleOverheatTimer()
@@ -147,6 +145,22 @@ public class TankShooter : NetworkBehaviour
             _localIsOverheated = false;
             _localHeat = 0f;
         }
+    }
+
+    private void SyncHeatIfNeeded()
+    {
+        bool heatChanged = Mathf.Abs(_localHeat - _lastSyncedHeat) >= HEAT_SYNC_THRESHOLD;
+        bool overheatChanged = _localIsOverheated != _lastSyncedOverheated;
+
+        if (!heatChanged && !overheatChanged) return;
+
+        _lastSyncedHeat = _localHeat;
+        _lastSyncedOverheated = _localIsOverheated;
+
+        if (IsServer)
+            UpdateHeatOnServer(_localHeat, _localIsOverheated);
+        else
+            SyncHeatServerRpc(_localHeat, _localIsOverheated);
     }
 
     private void HandleAim()
