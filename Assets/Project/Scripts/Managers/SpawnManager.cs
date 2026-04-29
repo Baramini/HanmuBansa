@@ -48,18 +48,10 @@ public class SpawnManager : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        Debug.Log($"SpawnAllPlayers called. Connected clients: {NetworkManager.Singleton.ConnectedClients.Count}");
-
         int spawnIndex = 0;
-
-        // -- _connectedClients 대신 NetworkManager에서 직접 가져옴 --
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            Debug.Log($"Spawning for clientId: {clientId}");
-
             GameObject prefab = TankSelectManager.Instance?.GetTankPrefab(clientId);
-            Debug.Log($"Prefab: {prefab}");
-
             Vector3 pos = spawnIndex < spawnPoints.Count
                 ? spawnPoints[spawnIndex].position
                 : Vector3.zero;
@@ -68,11 +60,25 @@ public class SpawnManager : NetworkBehaviour
             NetworkObject netObj = tank.GetComponent<NetworkObject>();
             netObj.SpawnAsPlayerObject(clientId);
 
-            TankHealth health = tank.GetComponent<TankHealth>();
-            GameManager.Instance?.SetPlayer(health);
+            // -- Get player name from Lobby data --
+            string playerName = GetPlayerName(clientId);
+            GameManager.Instance?.SetPlayer(
+                tank.GetComponent<TankHealth>(), clientId, playerName);
 
-            Debug.Log($"SetPlayer called for clientId: {clientId}");
             spawnIndex++;
         }
+    }
+
+    private string GetPlayerName(ulong clientId)
+    {
+        var lobby = MatchManager.Instance?.CurrentLobby;
+        if (lobby == null) return $"Player {clientId}";
+
+        foreach (var player in lobby.Players)
+        {
+            if (player.Data != null && player.Data.ContainsKey("PlayerName"))
+                return player.Data["PlayerName"].Value;
+        }
+        return $"Player {clientId}";
     }
 }

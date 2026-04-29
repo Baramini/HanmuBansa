@@ -625,3 +625,4 @@ MonoBehaviour:
   canvasGroup: {fileID: 3962010895097003923}
   fadeDuration: 0.5
   messageText: {fileID: 5832273838329371144}
+  closeButton: {fileID: 4564199041490664199}

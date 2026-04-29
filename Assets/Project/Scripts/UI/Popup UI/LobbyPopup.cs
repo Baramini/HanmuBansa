@@ -42,12 +42,6 @@ public class LobbyPopup : PopupUI
 
         if (TankSelectManager.Instance != null)
             TankSelectManager.Instance.OnSelectionChanged += OnSelectionChanged;
-
-        if (NetworkManager.Singleton != null)
-        {
-            NetworkManager.Singleton.OnClientConnectedCallback += OnPlayerJoined;
-            NetworkManager.Singleton.OnClientDisconnectCallback += OnPlayerLeft;
-        }
     }
 
     public override void Show()
@@ -159,6 +153,16 @@ public class LobbyPopup : PopupUI
         RefreshStartButton();
     }
 
+    public void OnPlayerLeftNotified(ulong leftClientId)
+    {
+        if (_clientSlotMap.TryGetValue(leftClientId, out int slotIndex))
+        {
+            playerSlots[slotIndex]?.SetEmpty();
+            _clientSlotMap.Remove(leftClientId);
+        }
+        RefreshStartButton();
+    }
+
     private string GetPlayerName(ulong clientId)
     {
         // -- TODO: get from Lobby player data --
@@ -168,21 +172,25 @@ public class LobbyPopup : PopupUI
             : $"Player {clientId}";
     }
 
-    private void RefreshPlayerSlots()
+    public void RefreshPlayerSlots()
     {
         var lobby = MatchManager.Instance?.CurrentLobby;
-        int slotIndex = 0;
 
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            if (slotIndex >= playerSlots.Length) break;
+            if (_clientSlotMap.ContainsKey(clientId)) continue;
 
-            // -- Skip if already mapped --
-            if (_clientSlotMap.ContainsValue(slotIndex))
+            int emptySlot = -1;
+            for (int i = 0; i < playerSlots.Length; i++)
             {
-                slotIndex++;
-                continue;
+                if (!_clientSlotMap.ContainsValue(i))
+                {
+                    emptySlot = i;
+                    break;
+                }
             }
+
+            if (emptySlot == -1) break;
 
             string playerName = GetPlayerData(lobby, clientId, "PlayerName", $"Player {clientId}");
             string wins = GetPlayerData(lobby, clientId, "Wins", "0");
@@ -190,11 +198,11 @@ public class LobbyPopup : PopupUI
             string draws = GetPlayerData(lobby, clientId, "Draws", "0");
             string record = $"Win: {wins}  Lose: {losses}  Draw: {draws}";
 
-            bool isHost = NetworkManager.Singleton.IsHost && (clientId == NetworkManager.Singleton.LocalClientId);
+            bool isHost = NetworkManager.Singleton.IsHost
+                          && clientId == NetworkManager.Singleton.LocalClientId;
 
-            playerSlots[slotIndex]?.SetPlayer(playerName, record, isHost);
-            _clientSlotMap[clientId] = slotIndex;
-            slotIndex++;
+            playerSlots[emptySlot]?.SetPlayer(playerName, record, isHost);
+            _clientSlotMap[clientId] = emptySlot;
         }
     }
 

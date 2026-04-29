@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using BrmnModules.UI;
+using BrmnModules.Audio;
 
 public class SettingsPopup : PopupUI
 {
@@ -13,57 +14,54 @@ public class SettingsPopup : PopupUI
     {
         base.Initialize();
 
-        // -- Set default values --
-        if (masterSlider != null) masterSlider.value = 0.5f;
-        if (sfxSlider != null) sfxSlider.value = 0.5f;
-        if (bgmSlider != null) bgmSlider.value = 0.5f;
+        SetupSlider(masterSlider);
+        SetupSlider(sfxSlider);
+        SetupSlider(bgmSlider);
 
-        // -- Register slider callbacks --
         masterSlider?.onValueChanged.AddListener(OnMasterChanged);
         sfxSlider?.onValueChanged.AddListener(OnSFXChanged);
         bgmSlider?.onValueChanged.AddListener(OnBGMChanged);
     }
 
-    public override void OnCloseButton()
+    private void SetupSlider(Slider slider)
     {
-        SaveSettings();
-        base.OnCloseButton();
-    }
-
-    private void OnMasterChanged(float value)
-    {
-        // -- TODO: AudioManager.Instance?.SetMasterVolume(value) --
-    }
-
-    private void OnSFXChanged(float value)
-    {
-        // -- TODO: AudioManager.Instance?.SetSFXVolume(value) --
-    }
-
-    private void OnBGMChanged(float value)
-    {
-        // -- TODO: AudioManager.Instance?.SetBGMVolume(value) --
-    }
-
-    private void SaveSettings()
-    {
-        // -- Save to PlayerPrefs for persistence --
-        if (masterSlider != null) PlayerPrefs.SetFloat("MasterVolume", masterSlider.value);
-        if (sfxSlider != null) PlayerPrefs.SetFloat("SFXVolume", sfxSlider.value);
-        if (bgmSlider != null) PlayerPrefs.SetFloat("BGMVolume", bgmSlider.value);
-        PlayerPrefs.Save();
-    }
-
-    private void LoadSettings()
-    {
-        if (masterSlider != null) masterSlider.value = PlayerPrefs.GetFloat("MasterVolume", 1f);
-        if (sfxSlider != null) sfxSlider.value = PlayerPrefs.GetFloat("SFXVolume", 1f);
-        if (bgmSlider != null) bgmSlider.value = PlayerPrefs.GetFloat("BGMVolume", 1f);
+        if (slider == null) return;
+        slider.minValue = 0;
+        slider.maxValue = 10;
+        slider.wholeNumbers = true;
     }
 
     public override void Show()
     {
-        LoadSettings();  // -- Load saved values on open --
+        masterSlider?.onValueChanged.RemoveListener(OnMasterChanged);
+        sfxSlider?.onValueChanged.RemoveListener(OnSFXChanged);
+        bgmSlider?.onValueChanged.RemoveListener(OnBGMChanged);
+
+        if (masterSlider != null)
+            masterSlider.value = AudioManager.Instance?.GetMasterVolume() ?? 5;
+        if (sfxSlider != null)
+            sfxSlider.value = AudioManager.Instance?.GetSFXVolume() ?? 5;
+        if (bgmSlider != null)
+            bgmSlider.value = AudioManager.Instance?.GetBGMVolume() ?? 5;
+
+        masterSlider?.onValueChanged.AddListener(OnMasterChanged);
+        sfxSlider?.onValueChanged.AddListener(OnSFXChanged);
+        bgmSlider?.onValueChanged.AddListener(OnBGMChanged);
+
         base.Show();
     }
+
+    public override void OnCloseButton()
+    {
+        base.OnCloseButton();
+    }
+
+    private void OnMasterChanged(float value)
+        => AudioManager.Instance?.SetMasterVolume((int)value);
+
+    private void OnSFXChanged(float value)
+        => AudioManager.Instance?.SetSFXVolume((int)value);
+
+    private void OnBGMChanged(float value)
+        => AudioManager.Instance?.SetBGMVolume((int)value);
 }

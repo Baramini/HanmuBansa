@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Project\Scripts\Managers\SpawnManager.cs" />
+    <Compile Include="Assets\Project\Scripts\Managers\NetworkBridge.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Item\ShieldEffect.cs" />
     <Compile Include="Assets\Project\Scripts\Modules\UIManager.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Projectile\Projectile.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Assets\Project\Scripts\GamePlay\Tank\TankStatus.cs" />
     <Compile Include="Assets\Project\Scripts\UI\Popup UI\TankSelectPopup.cs" />
     <Compile Include="Assets\Project\Scripts\Managers\UGSManager.cs" />
+    <Compile Include="Assets\Project\Scripts\Modules\SceneInitializer.cs" />
     <Compile Include="Assets\Project\Scripts\Managers\MatchManager.cs" />
     <Compile Include="Assets\Project\Scripts\Modules\IMovementInput.cs" />
     <Compile Include="Assets\Project\Scripts\Managers\PlayerRecordManager.cs" />
@@ -93,15 +95,18 @@
     <Compile Include="Assets\Project\Scripts\UI\Popup UI\SinglePlayPopup.cs" />
     <Compile Include="Assets\Project\Scripts\UI\Popup UI\PlayerNamePopup.cs" />
     <Compile Include="Assets\Project\Scripts\UI\HUD.cs" />
+    <Compile Include="Assets\Project\Scripts\Modules\AudioManager.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Project\Scripts\UI\PlayerSlotUI.cs" />
     <Compile Include="Assets\Project\Scripts\UI\Popup UI\MultiPlayPopup.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Tank\TankShooter.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Item\ItemSpawner.cs" />
     <Compile Include="Assets\Project\Scripts\UI\SafeAreaFitter.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\Popup UI\GameOverPopup.cs" />
     <Compile Include="Assets\Project\Scripts\UI\TankSlotUI.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Item\ShieldItem.cs" />
     <Compile Include="Assets\Project\Scripts\Modules\BaseUI.cs" />
+    <Compile Include="Assets\Project\Scripts\Modules\AudioClipData.cs" />
     <Compile Include="Assets\Project\Scripts\Common\TankSpriteContainer.cs" />
     <Compile Include="Assets\Project\Scripts\UI\Popup UI\ResultPopup.cs" />
     <Compile Include="Assets\Project\Scripts\Network\ClientNetworkTransform.cs" />

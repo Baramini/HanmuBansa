@@ -123,4 +123,10 @@ public class TankSelectManager : NetworkBehaviour
     {
         return _selections.TryGetValue(clientId, out int index) ? index : -1;
     }
+
+    public void ResetSelections()
+    {
+        _selections.Clear();
+        SyncSelectionsClientRpc(new ulong[0]);
+    }
 }

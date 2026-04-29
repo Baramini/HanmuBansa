@@ -144,6 +144,13 @@ namespace BrmnModules.UI
             return null;
         }
 
+        public bool IsPopupOpen<T>() where T : PopupUI
+        {
+            System.Type type = typeof(T);
+            if (!_popupCache.TryGetValue(type, out PopupUI popup)) return false;
+            return popup.gameObject.activeInHierarchy;
+        }
+
         private void RemoveFromStack(PopupUI popup)
         {
             // -- Rebuild stack without the target popup --

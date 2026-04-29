@@ -12,10 +12,11 @@ public class PlayerSlotUI : MonoBehaviour
 
     public void SetPlayer(string playerName, string record, bool isHost)
     {
+        if (emptyState != null) emptyState.SetActive(false);
+
         if (nameText != null) nameText.text = playerName;
         if (recordText != null) recordText.text = record;
         if (hostBadge != null) hostBadge.SetActive(isHost);
-        if (emptyState != null) emptyState.SetActive(false);
     }
 
     public void SetTank(Sprite sprite)
