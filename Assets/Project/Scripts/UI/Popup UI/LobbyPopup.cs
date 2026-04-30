@@ -26,6 +26,8 @@ public class LobbyPopup : PopupUI
     [SerializeField] private Image mapPreviewImage;
     [SerializeField] private GameObject mapControlButtons;
     [SerializeField] private List<Sprite> mapSprites;
+    [SerializeField] private TextMeshProUGUI mapName;
+
     private int _currentMapIndex = 0;
     private float _lobbyPollTimer = 0f;
     private const float LOBBY_POLL_INTERVAL = 2f;
@@ -67,7 +69,6 @@ public class LobbyPopup : PopupUI
 
     private async System.Threading.Tasks.Task PollLobbyAsync()
     {
-        // -- Stop polling if lobby is gone --
         if (MatchManager.Instance?.CurrentLobby == null) return;
         if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsConnectedClient) return;
 
@@ -76,19 +77,30 @@ public class LobbyPopup : PopupUI
             var lobby = await LobbyService.Instance
                 .GetLobbyAsync(MatchManager.Instance.CurrentLobby.Id);
 
-            if (lobby.Data != null && lobby.Data.ContainsKey("SelectedMap"))
+            if (lobby.Data == null) return;
+
+            bool isRandom = lobby.Data.ContainsKey("IsRandomMap") &&
+                            bool.Parse(lobby.Data["IsRandomMap"].Value);
+
+            if (lobby.Data.ContainsKey("SelectedMap"))
             {
                 int mapIndex = int.Parse(lobby.Data["SelectedMap"].Value);
-                if (mapIndex != _currentMapIndex)
+
+                if (isRandom)
+                {
+                    // -- Show random sprite regardless of actual map index --
+                    _currentMapIndex = mapSprites.Count - 1;
+                }
+                else
                 {
                     _currentMapIndex = mapIndex;
-                    UpdateMapPreview(_currentMapIndex);
                 }
+
+                UpdateMapPreview(_currentMapIndex);
             }
         }
         catch (LobbyServiceException e)
         {
-            // -- Lobby not found: stop polling --
             Debug.Log($"Lobby no longer exists. Stopping poll. ({e.Message})");
             _lobbyPollTimer = float.MaxValue;
         }
@@ -253,6 +265,7 @@ public class LobbyPopup : PopupUI
         if (index < 0 || index >= mapSprites.Count) return;
 
         mapPreviewImage.sprite = mapSprites[index];
+        mapName.text = mapSprites[index].name;
     }
 
     public void OnMapNextButton()
@@ -262,11 +275,12 @@ public class LobbyPopup : PopupUI
         _currentMapIndex = (_currentMapIndex + 1) % mapSprites.Count;
         UpdateMapPreview(_currentMapIndex);
 
-        int sendIndex = IsRandomIndex(_currentMapIndex)
+        bool isRandom = IsRandomIndex(_currentMapIndex);
+        int sendIndex = isRandom
             ? Random.Range(0, mapSprites.Count - 1)
             : _currentMapIndex;
 
-        _ = MatchManager.Instance?.SetSelectedMapAsync(sendIndex);
+        _ = MatchManager.Instance?.SetSelectedMapAsync(sendIndex, isRandom);
     }
 
     public void OnMapPrevButton()
@@ -276,11 +290,12 @@ public class LobbyPopup : PopupUI
         _currentMapIndex = (_currentMapIndex - 1 + mapSprites.Count) % mapSprites.Count;
         UpdateMapPreview(_currentMapIndex);
 
-        int sendIndex = IsRandomIndex(_currentMapIndex)
+        bool isRandom = IsRandomIndex(_currentMapIndex);
+        int sendIndex = isRandom
             ? Random.Range(0, mapSprites.Count - 1)
             : _currentMapIndex;
 
-        _ = MatchManager.Instance?.SetSelectedMapAsync(sendIndex);
+        _ = MatchManager.Instance?.SetSelectedMapAsync(sendIndex, isRandom);
     }
 
     private bool IsRandomIndex(int index) => index == mapSprites.Count - 1;

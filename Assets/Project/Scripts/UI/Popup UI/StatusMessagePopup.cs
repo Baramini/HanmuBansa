@@ -7,7 +7,7 @@ using BrmnModules.UI;
 public class StatusMessagePopup : PopupUI
 {
     [SerializeField] private TextMeshProUGUI messageText;
-
+    
     private Coroutine _autoCloseCoroutine;
 
     public override void OnCloseButton() { }

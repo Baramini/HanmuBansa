@@ -2558,17 +2558,13 @@ PrefabInstance:
       value: AudioManager
       objectReference: {fileID: 0}
     - target: {fileID: 8809471943721380963, guid: b2db39d6e7fcdc143bafc5120869a3c0, type: 3}
-      propertyPath: defaultBGMVolume
-      value: 5
-      objectReference: {fileID: 0}
+      propertyPath: bgmData
+      value: 
+      objectReference: {fileID: 11400000, guid: 091b1b9a0c53bff4d86338d82e99ea1e, type: 2}
     - target: {fileID: 8809471943721380963, guid: b2db39d6e7fcdc143bafc5120869a3c0, type: 3}
-      propertyPath: defaultSFXVolume
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8809471943721380963, guid: b2db39d6e7fcdc143bafc5120869a3c0, type: 3}
-      propertyPath: defaultMasterVolume
-      value: 5
-      objectReference: {fileID: 0}
+      propertyPath: sfxData
+      value: 
+      objectReference: {fileID: 11400000, guid: f57b018b35f233340b2f3c5779b5a07d, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -23,7 +23,6 @@ public class GameManager : NetworkBehaviour
 
     public event System.Action<float> OnTimerChanged;
     public event System.Action<int> OnAliveCountChanged;
-    public event System.Action OnSpecialItemWarning;
     public event System.Action OnSpecialItemSpawn;
     public event System.Action<string> OnGameEnd;
 
@@ -217,7 +216,8 @@ public class GameManager : NetworkBehaviour
     [ClientRpc]
     private void NotifySpecialItemWarningClientRpc()
     {
-        OnSpecialItemWarning?.Invoke();
+        UIManager.Instance?.ShowPopup<ItemWarningPopup>();
+        AudioManager.Instance?.PlaySFX("Warning");
     }
 
     [ClientRpc]

@@ -10,15 +10,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 4e568fa667e0994408cdccbcbcae96c8, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.16
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4e568fa667e0994408cdccbcbcae96c8, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.16
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4e568fa667e0994408cdccbcbcae96c8, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.16
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4e568fa667e0994408cdccbcbcae96c8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -209,7 +209,7 @@ MonoBehaviour:
   UseHalfFloatPrecision: 0
   InLocalSpace: 0
   SwitchTransformSpaceWhenParented: 0
-  Interpolate: 1
+  Interpolate: 0
   SlerpPosition: 0
 --- !u!114 &8768226808406483531
 MonoBehaviour:

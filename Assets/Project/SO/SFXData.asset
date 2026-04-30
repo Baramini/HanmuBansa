@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: SFXData
   m_EditorClassIdentifier: Assembly-CSharp:BrmnModules.Audio:SFXData
   entries:
-  - key: Shoot
-    clip: {fileID: 8300000, guid: af66162561d2eed40ad49268cab318bb, type: 3}
+  - key: Fire
+    clip: {fileID: 8300000, guid: d7cc8c5ce8b17ae48b72fe28f782abdc, type: 3}
   - key: Explosion
-    clip: {fileID: 8300000, guid: d4aee29185389894b9cc0d8873904a49, type: 3}
-  - key: GetItem
-    clip: {fileID: 8300000, guid: 3aa3ab3c3d5f24f4da6be38fa605a5e2, type: 3}
+    clip: {fileID: 8300000, guid: 5d0b41d906588e64ea50cb68393cc2fd, type: 3}
   - key: Warning
     clip: {fileID: 8300000, guid: 6aeeb14b92383fe40ba7aea8406ca4e2, type: 3}
+  - key: GetItem
+    clip: {fileID: 8300000, guid: 3aa3ab3c3d5f24f4da6be38fa605a5e2, type: 3}

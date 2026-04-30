@@ -37,7 +37,6 @@ public class ItemSpawner : NetworkBehaviour
         if (!IsServer) return;
 
         // -- Subscribe to game timer events --
-        GameManager.Instance.OnSpecialItemWarning += OnSpecialItemWarning;
         GameManager.Instance.OnSpecialItemSpawn   += OnSpecialItemSpawn;
 
         StartCoroutine(NormalItemSpawnCoroutine());
@@ -49,7 +48,6 @@ public class ItemSpawner : NetworkBehaviour
 
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.OnSpecialItemWarning -= OnSpecialItemWarning;
             GameManager.Instance.OnSpecialItemSpawn   -= OnSpecialItemSpawn;
         }
     }

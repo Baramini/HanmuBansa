@@ -1,6 +1,8 @@
 using UnityEngine;
 using Unity.Netcode;
 using BrmnModules.Pool;
+using BrmnModules.Audio;
+using UnityEngine.UIElements;
 
 public class Projectile : NetworkBehaviour
 {
@@ -44,6 +46,9 @@ public class Projectile : NetworkBehaviour
         _rb = GetComponent<Rigidbody>();
         _rb.linearVelocity = velocity;
         _speed = velocity.magnitude;
+
+        // Written here for the efficient use of network resources
+        AudioManager.Instance?.PlaySFXAtPosition("Fire", transform.position);
     }
 
     private void FixedUpdate()
@@ -78,6 +83,9 @@ public class Projectile : NetworkBehaviour
         {
             hit.GetComponent<Projectile>()?.ReturnToPool();
             ReturnToPool();
+
+            PlayCollisionSFXClientRpc(transform.position);
+
             return;
         }
 
@@ -94,9 +102,16 @@ public class Projectile : NetworkBehaviour
             {
                 hit.GetComponent<TankHealth>()?.TakeDamage(1);
                 ReturnToPool();
+                PlayCollisionSFXClientRpc(status.transform.position);
             }
             return;
         }
+    }
+
+    [ClientRpc]
+    private void PlayCollisionSFXClientRpc(Vector3 position)
+    {
+        AudioManager.Instance?.PlaySFXAtPosition("Explosion", position);
     }
 
     private void Reflect(Vector3 normal)

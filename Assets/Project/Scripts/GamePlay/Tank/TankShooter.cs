@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using Unity.Netcode;
 using BrmnModules.Pool;
 using BrmnModules.UI;
+using BrmnModules.Audio;
 
 public class TankShooter : NetworkBehaviour
 {
@@ -132,7 +133,6 @@ public class TankShooter : NetworkBehaviour
         // -- Use cached HUD reference --
         _hud?.SetChargeRatio(ChargeRatio);
         _hud?.SetHeatRatio(HeatRatio);
-        //UIManager.Instance?.GetPersistent<HUD>()?.SetOverheated(_localIsOverheated);
     }
 
     private void HandleOverheatTimer()
@@ -182,6 +182,7 @@ public class TankShooter : NetworkBehaviour
 
     private void OnFireStarted(InputAction.CallbackContext ctx)
     {
+        if (UIManager.Instance?.IsAnyPopupOpen ?? false) return;
         if (GameManager.Instance == null || !GameManager.Instance.IsGameStarted) return;
 
         // -- Check local state for immediate response --

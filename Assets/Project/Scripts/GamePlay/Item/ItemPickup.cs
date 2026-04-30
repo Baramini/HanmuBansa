@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Netcode;
+using BrmnModules.Audio;
 
 // Attached to item prefabs.
 // Detects tank collision and triggers item effect on server.
@@ -35,6 +36,8 @@ public class ItemPickup : NetworkBehaviour
 
             // -- Notify all clients to hide item --
             HideItemClientRpc();
+
+            AudioManager.Instance?.PlaySFX("GetItem");
         }
     }
 

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
+using BrmnModules.UI;
 
 // NetworkBehaviour: MonoBehaviour + network functionality
 // IsOwner: true only for the local player who owns this object
@@ -64,7 +65,7 @@ public class TankController : NetworkBehaviour
     {
         // -- Only the owner moves their own tank --
         if (!IsOwner) return;
-
+        if (UIManager.Instance?.IsAnyPopupOpen ?? false) return;
         if (GameManager.Instance == null || !GameManager.Instance.IsGameStarted) return;
 
         HandleMovement();

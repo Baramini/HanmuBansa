@@ -42,7 +42,6 @@ public class TankSelectManager : NetworkBehaviour
 
         // -- Register selection --
         _selections[clientId] = tankIndex;
-        Debug.Log($"Client {clientId} selected tank {tankIndex}");
 
         // -- Sync current selections to all clients --
         SyncSelectionsClientRpc(BuildSelectionArray());

@@ -24,7 +24,6 @@ public class MatchManager : MonoBehaviour
 
     private const int MAX_PLAYERS = 4;
     private const string RELAY_CODE_KEY = "RelayCode";
-    private const string MAP_KEY = "SelectedMap";
 
     private Lobby _currentLobby = null;
     private Coroutine _heartbeatCoroutine = null;
@@ -175,14 +174,14 @@ public class MatchManager : MonoBehaviour
 
             _heartbeatCoroutine = StartCoroutine(HeartbeatCoroutine());
 
-            string connectionType = Application.isEditor ? "udp" : "dtls";
+            string connectionType = Application.isEditor ? "udp" :
+                                    Application.platform == RuntimePlatform.WebGLPlayer ? "wss" : "dtls";
             RelayServerData relayData = GetHostRelayData(allocation, connectionType);
             NetworkManager.Singleton.GetComponent<UnityTransport>()
                 .SetRelayServerData(relayData);
             NetworkManager.Singleton.StartHost();
 
             OnRoomCodeGenerated?.Invoke(_currentLobby.LobbyCode);
-            Debug.Log($"Room created. Code: {_currentLobby.LobbyCode}");
         }
         catch (System.Exception e)
         {
@@ -350,8 +349,6 @@ public class MatchManager : MonoBehaviour
 
             _currentLobby = null;
             NetworkManager.Singleton.Shutdown();
-
-            Debug.Log("Left room.");
         }
         catch (System.Exception e)
         {
@@ -421,7 +418,10 @@ public class MatchManager : MonoBehaviour
     // -- MAP SELECT -----------------------------------------
     // -------------------------------------------------------
 
-    public async Task SetSelectedMapAsync(int mapIndex)
+    private const string MAP_KEY = "SelectedMap";
+    private const string MAP_RANDOM_KEY = "IsRandomMap";
+
+    public async Task SetSelectedMapAsync(int mapIndex, bool isRandom = false)
     {
         if (_currentLobby == null) return;
 
@@ -430,14 +430,18 @@ public class MatchManager : MonoBehaviour
             UpdateLobbyOptions options = new UpdateLobbyOptions
             {
                 Data = new Dictionary<string, DataObject>
-                {
-                    { RELAY_CODE_KEY, new DataObject(
-                        DataObject.VisibilityOptions.Public,
-                        _currentLobby.Data[RELAY_CODE_KEY].Value) },
-                    { MAP_KEY, new DataObject(
-                        DataObject.VisibilityOptions.Member,
-                        mapIndex.ToString()) }
-                }
+            {
+                { RELAY_CODE_KEY, new DataObject(
+                    DataObject.VisibilityOptions.Public,
+                    _currentLobby.Data[RELAY_CODE_KEY].Value) },
+                { MAP_KEY, new DataObject(
+                    DataObject.VisibilityOptions.Member,
+                    mapIndex.ToString()) },
+                // -- Store random flag separately --
+                { MAP_RANDOM_KEY, new DataObject(
+                    DataObject.VisibilityOptions.Member,
+                    isRandom.ToString()) }
+            }
             };
 
             _currentLobby = await LobbyService.Instance
@@ -447,6 +451,13 @@ public class MatchManager : MonoBehaviour
         {
             Debug.LogError($"SetSelectedMap error: {e.Message}");
         }
+    }
+
+    public bool GetIsRandomMap()
+    {
+        if (_currentLobby?.Data == null) return false;
+        if (!_currentLobby.Data.ContainsKey(MAP_RANDOM_KEY)) return false;
+        return bool.Parse(_currentLobby.Data[MAP_RANDOM_KEY].Value);
     }
 
     public int GetSelectedMapIndex()

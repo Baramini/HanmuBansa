@@ -218,7 +218,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 16
+  orthographic size: 12
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1151,6 +1151,8 @@ MonoBehaviour:
   - {fileID: 4591407451945384368, guid: bc658f11e350980468dcd204940cb251, type: 3}
   - {fileID: 5168267181158454993, guid: ba8cab000af68d34cb74bf2049ccf5cf, type: 3}
   - {fileID: 879620225595335326, guid: a762d91536c5a82479883278bc05070e, type: 3}
+  - {fileID: 4794652885062718813, guid: 7e48afe12d23bf54899d3c70ffcc553a, type: 3}
+  - {fileID: 5405733326513804064, guid: 51f07246690a9e249a2404cdf9daf6ca, type: 3}
   popupRoot: {fileID: 1979451596}
   backdrop: {fileID: 420668065}
 --- !u!1 &330366293
@@ -1678,6 +1680,68 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 554620454}
   m_CullTransparentMesh: 1
+--- !u!1 &623163136
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 623163138}
+  - component: {fileID: 623163137}
+  m_Layer: 0
+  m_Name: InputController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &623163137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 623163136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 488b9f66cd3a66c48ac422a0e3a905b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BrmnModules.Common.KeyActionTrigger
+  bindings:
+  - label: Open Setting Popup
+    key: 60
+    onPressed:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 329909318}
+          m_TargetAssemblyTypeName: BrmnModules.UI.UIManager, Assembly-CSharp
+          m_MethodName: ShowSettingsPopup
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+--- !u!4 &623163138
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 623163136}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &628609543
 GameObject:
   m_ObjectHideFlags: 0
@@ -3188,7 +3252,7 @@ MonoBehaviour:
     CustomLookAtTarget: 0
   Lens:
     FieldOfView: 60
-    OrthographicSize: 16
+    OrthographicSize: 12
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
@@ -3255,6 +3319,7 @@ MonoBehaviour:
   itemParent: {fileID: 282806441}
   normalItemPrefabs:
   - {fileID: 519974796596659617, guid: 996928e6bd7f53b4c922c5099f203847, type: 3}
+  - {fileID: 8475833574052523601, guid: a1614f0cf649e3a4e894d20bda9008e7, type: 3}
   normalSpawnPointsParent: {fileID: 289560658}
   spawnInterval: 20
   specialItemPrefab: {fileID: 5225455176718880169, guid: 59fd80584945fc7448940995b97dab30, type: 3}
@@ -4445,4 +4510,5 @@ SceneRoots:
   - {fileID: 628609544}
   - {fileID: 329909317}
   - {fileID: 1567080214}
+  - {fileID: 623163138}
   - {fileID: 1170698947}

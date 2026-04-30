@@ -102,25 +102,6 @@ namespace BrmnModules.UI
                 backdrop.SetActive(false);
         }
 
-        // -------------------------------------------------------
-        // -- Persistent API -------------------------------------
-        // -------------------------------------------------------
-
-        public T GetPersistent<T>() where T : PersistentUI
-        {
-            foreach (var ui in persistentUIs)
-            {
-                if (ui is T target)
-                    return target;
-            }
-            Debug.LogWarning($"UIManager: PersistentUI of type {typeof(T)} not found.");
-            return null;
-        }
-
-        // -------------------------------------------------------
-        // -- Internal -------------------------------------------
-        // -------------------------------------------------------
-
         public T GetPopup<T>() where T : PopupUI
         {
             System.Type type = typeof(T);
@@ -151,6 +132,8 @@ namespace BrmnModules.UI
             return popup.gameObject.activeInHierarchy;
         }
 
+        public bool IsAnyPopupOpen => _popupStack.Count > 0;
+
         private void RemoveFromStack(PopupUI popup)
         {
             // -- Rebuild stack without the target popup --
@@ -163,6 +146,31 @@ namespace BrmnModules.UI
             }
 
             while (temp.Count > 0) _popupStack.Push(temp.Pop());
+        }
+
+        // -------------------------------------------------------
+        // -- Persistent API -------------------------------------
+        // -------------------------------------------------------
+
+        public T GetPersistent<T>() where T : PersistentUI
+        {
+            foreach (var ui in persistentUIs)
+            {
+                if (ui is T target)
+                    return target;
+            }
+            Debug.LogWarning($"UIManager: PersistentUI of type {typeof(T)} not found.");
+            return null;
+        }
+
+        // -------------------------------------------------------
+        // -- Internal -------------------------------------------
+        // -------------------------------------------------------
+
+        public void ShowSettingsPopup()
+        {
+            if (!IsPopupOpen<SettingsPopup>()) ShowPopup<SettingsPopup>();
+            else HidePopup<SettingsPopup>();
         }
     }
 }
