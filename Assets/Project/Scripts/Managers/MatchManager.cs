@@ -174,10 +174,10 @@ public class MatchManager : MonoBehaviour
 
             _heartbeatCoroutine = StartCoroutine(HeartbeatCoroutine());
 
+            SetupTransport();
             string connectionType = GetConnectionType();
-            RelayServerData relayData = GetHostRelayData(allocation, connectionType);
             NetworkManager.Singleton.GetComponent<UnityTransport>()
-                .SetRelayServerData(relayData);
+                .SetRelayServerData(AllocationUtils.ToRelayServerData(allocation, connectionType));
             NetworkManager.Singleton.StartHost();
 
             OnRoomCodeGenerated?.Invoke(_currentLobby.LobbyCode);
@@ -209,10 +209,10 @@ public class MatchManager : MonoBehaviour
             JoinAllocation joinAllocation = await RelayService.Instance
                 .JoinAllocationAsync(relayCode);
 
+            SetupTransport();
             string connectionType = GetConnectionType();
-            RelayServerData relayData = GetClientRelayData(joinAllocation, connectionType);
             NetworkManager.Singleton.GetComponent<UnityTransport>()
-                .SetRelayServerData(relayData);
+                .SetRelayServerData(AllocationUtils.ToRelayServerData(joinAllocation, connectionType));
             NetworkManager.Singleton.StartClient();
 
             OnMatchStarted?.Invoke();
@@ -240,10 +240,10 @@ public class MatchManager : MonoBehaviour
             JoinAllocation joinAllocation = await RelayService.Instance
                 .JoinAllocationAsync(relayCode);
 
+            SetupTransport();
             string connectionType = GetConnectionType();
-            RelayServerData relayData = GetClientRelayData(joinAllocation, connectionType);
             NetworkManager.Singleton.GetComponent<UnityTransport>()
-                .SetRelayServerData(relayData);
+                .SetRelayServerData(AllocationUtils.ToRelayServerData(joinAllocation, connectionType));
             NetworkManager.Singleton.StartClient();
 
             OnMatchStarted?.Invoke();
@@ -484,32 +484,31 @@ public class MatchManager : MonoBehaviour
     // -- Relay Helpers --------------------------------------
     // -------------------------------------------------------
 
-    private RelayServerData GetHostRelayData(Allocation allocation, string connectionType)
-    {
-        return new RelayServerData(
-            allocation.RelayServer.IpV4,
-            (ushort)allocation.RelayServer.Port,
-            allocation.AllocationIdBytes,
-            allocation.ConnectionData,
-            allocation.ConnectionData,
-            allocation.Key,
-            connectionType == "dtls"
-        );
-    }
+    // private RelayServerData GetHostRelayData(Allocation allocation, string connectionType)
+    // {
+    //     return new RelayServerData(
+    //         allocation.RelayServer.IpV4,
+    //         (ushort)allocation.RelayServer.Port,
+    //         allocation.AllocationIdBytes,
+    //         allocation.ConnectionData,
+    //         allocation.ConnectionData,
+    //         allocation.Key,
+    //         connectionType == "dtls" || connectionType == "wss"  // isSecure
+    //     );
+    // }
 
-    private RelayServerData GetClientRelayData(JoinAllocation joinAllocation,
-        string connectionType)
-    {
-        return new RelayServerData(
-            joinAllocation.RelayServer.IpV4,
-            (ushort)joinAllocation.RelayServer.Port,
-            joinAllocation.AllocationIdBytes,
-            joinAllocation.ConnectionData,
-            joinAllocation.HostConnectionData,
-            joinAllocation.Key,
-            connectionType == "dtls"
-        );
-    }
+    // private RelayServerData GetClientRelayData(JoinAllocation joinAllocation, string connectionType)
+    // {
+    //     return new RelayServerData(
+    //         joinAllocation.RelayServer.IpV4,
+    //         (ushort)joinAllocation.RelayServer.Port,
+    //         joinAllocation.AllocationIdBytes,
+    //         joinAllocation.ConnectionData,
+    //         joinAllocation.HostConnectionData,
+    //         joinAllocation.Key,
+    //         connectionType == "dtls" || connectionType == "wss"  // isSecure
+    //     );
+    // }
 
     // -------------------------------------------------------
     // -- Player Data ----------------------------------------
@@ -534,10 +533,21 @@ public class MatchManager : MonoBehaviour
         };
     }
 
+    private void SetupTransport()
+    {
+        var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+        bool useWebSocket = Application.platform == RuntimePlatform.WebGLPlayer;
+        Debug.Log($"SetupTransport. platform:{Application.platform} useWebSocket:{useWebSocket}");
+        transport.UseWebSockets = useWebSocket;
+    }
+
     private string GetConnectionType()
     {
-        if (Application.isEditor) return "udp";
-        if (Application.platform == RuntimePlatform.WebGLPlayer) return "wss";
-        return "dtls";
+        string type;
+        if (Application.isEditor) type = "udp";
+        else if (Application.platform == RuntimePlatform.WebGLPlayer) type = "wss";
+        else type = "dtls";
+        Debug.Log($"GetConnectionType: {type} platform:{Application.platform}");
+        return type;
     }
 }
