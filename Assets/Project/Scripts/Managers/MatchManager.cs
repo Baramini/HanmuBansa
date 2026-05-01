@@ -174,8 +174,7 @@ public class MatchManager : MonoBehaviour
 
             _heartbeatCoroutine = StartCoroutine(HeartbeatCoroutine());
 
-            string connectionType = Application.isEditor ? "udp" :
-                                    Application.platform == RuntimePlatform.WebGLPlayer ? "wss" : "dtls";
+            string connectionType = GetConnectionType();
             RelayServerData relayData = GetHostRelayData(allocation, connectionType);
             NetworkManager.Singleton.GetComponent<UnityTransport>()
                 .SetRelayServerData(relayData);
@@ -210,7 +209,7 @@ public class MatchManager : MonoBehaviour
             JoinAllocation joinAllocation = await RelayService.Instance
                 .JoinAllocationAsync(relayCode);
 
-            string connectionType = Application.isEditor ? "udp" : "dtls";
+            string connectionType = GetConnectionType();
             RelayServerData relayData = GetClientRelayData(joinAllocation, connectionType);
             NetworkManager.Singleton.GetComponent<UnityTransport>()
                 .SetRelayServerData(relayData);
@@ -241,7 +240,7 @@ public class MatchManager : MonoBehaviour
             JoinAllocation joinAllocation = await RelayService.Instance
                 .JoinAllocationAsync(relayCode);
 
-            string connectionType = Application.isEditor ? "udp" : "dtls";
+            string connectionType = GetConnectionType();
             RelayServerData relayData = GetClientRelayData(joinAllocation, connectionType);
             NetworkManager.Singleton.GetComponent<UnityTransport>()
                 .SetRelayServerData(relayData);
@@ -533,5 +532,12 @@ public class MatchManager : MonoBehaviour
                 PlayerDataObject.VisibilityOptions.Member,
                 RecordManager.Instance?.Draws.ToString() ?? "0") },
         };
+    }
+
+    private string GetConnectionType()
+    {
+        if (Application.isEditor) return "udp";
+        if (Application.platform == RuntimePlatform.WebGLPlayer) return "wss";
+        return "dtls";
     }
 }
