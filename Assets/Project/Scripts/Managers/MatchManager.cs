@@ -175,11 +175,29 @@ public class MatchManager : MonoBehaviour
             _heartbeatCoroutine = StartCoroutine(HeartbeatCoroutine());
 
             SetupTransport();
-            string connectionType = GetConnectionType();
-            NetworkManager.Singleton.GetComponent<UnityTransport>()
-                .SetRelayServerData(AllocationUtils.ToRelayServerData(allocation, connectionType));
-            NetworkManager.Singleton.StartHost();
+            Unity.Services.Multiplayer.RelayProtocol connectionType = GetConnectionType();
+            if (connectionType == Unity.Services.Multiplayer.RelayProtocol.UDP)
+            {
+                var relayServerData = new RelayServerData(
+                    allocation.RelayServer.IpV4,
+                    (ushort)allocation.RelayServer.Port,
+                    allocation.AllocationIdBytes,
+                    allocation.ConnectionData,
+                    allocation.ConnectionData,
+                    allocation.Key,
+                    false
+                );
 
+                NetworkManager.Singleton.GetComponent<UnityTransport>()
+                .SetRelayServerData(relayServerData);
+                NetworkManager.Singleton.StartHost();
+            }
+            else
+            {
+                NetworkManager.Singleton.GetComponent<UnityTransport>()
+                   .SetRelayServerData(AllocationUtils.ToRelayServerData(allocation, connectionType));
+                NetworkManager.Singleton.StartHost();
+            }
             OnRoomCodeGenerated?.Invoke(_currentLobby.LobbyCode);
         }
         catch (System.Exception e)
@@ -210,10 +228,29 @@ public class MatchManager : MonoBehaviour
                 .JoinAllocationAsync(relayCode);
 
             SetupTransport();
-            string connectionType = GetConnectionType();
-            NetworkManager.Singleton.GetComponent<UnityTransport>()
+            Unity.Services.Multiplayer.RelayProtocol connectionType = GetConnectionType();
+            if (connectionType == Unity.Services.Multiplayer.RelayProtocol.UDP)
+            {
+                var relayServerData = new RelayServerData(
+                    joinAllocation.RelayServer.IpV4,
+                    (ushort)joinAllocation.RelayServer.Port,
+                    joinAllocation.AllocationIdBytes,
+                    joinAllocation.ConnectionData,
+                    joinAllocation.HostConnectionData,
+                    joinAllocation.Key,
+                    false
+                );
+
+                NetworkManager.Singleton.GetComponent<UnityTransport>()
+                .SetRelayServerData(relayServerData);
+                NetworkManager.Singleton.StartClient();
+            }
+            else
+            {
+                NetworkManager.Singleton.GetComponent<UnityTransport>()
                 .SetRelayServerData(AllocationUtils.ToRelayServerData(joinAllocation, connectionType));
-            NetworkManager.Singleton.StartClient();
+                NetworkManager.Singleton.StartClient();
+            }
 
             OnMatchStarted?.Invoke();
             Debug.Log($"Joined room: {lobbyCode}");
@@ -241,10 +278,29 @@ public class MatchManager : MonoBehaviour
                 .JoinAllocationAsync(relayCode);
 
             SetupTransport();
-            string connectionType = GetConnectionType();
-            NetworkManager.Singleton.GetComponent<UnityTransport>()
+            Unity.Services.Multiplayer.RelayProtocol connectionType = GetConnectionType();
+            if (connectionType == Unity.Services.Multiplayer.RelayProtocol.UDP)
+            {
+                var relayServerData = new RelayServerData(
+                    joinAllocation.RelayServer.IpV4,
+                    (ushort)joinAllocation.RelayServer.Port,
+                    joinAllocation.AllocationIdBytes,
+                    joinAllocation.ConnectionData,
+                    joinAllocation.HostConnectionData,
+                    joinAllocation.Key,
+                    false
+                );
+
+                NetworkManager.Singleton.GetComponent<UnityTransport>()
+                .SetRelayServerData(relayServerData);
+                NetworkManager.Singleton.StartClient();
+            }
+            else
+            {
+                NetworkManager.Singleton.GetComponent<UnityTransport>()
                 .SetRelayServerData(AllocationUtils.ToRelayServerData(joinAllocation, connectionType));
-            NetworkManager.Singleton.StartClient();
+                NetworkManager.Singleton.StartClient();
+            }
 
             OnMatchStarted?.Invoke();
             Debug.Log("Auto match: joined existing room.");
@@ -541,12 +597,12 @@ public class MatchManager : MonoBehaviour
         transport.UseWebSockets = useWebSocket;
     }
 
-    private string GetConnectionType()
+    private Unity.Services.Multiplayer.RelayProtocol GetConnectionType()
     {
-        string type;
-        if (Application.isEditor) type = "udp";
-        else if (Application.platform == RuntimePlatform.WebGLPlayer) type = "wss";
-        else type = "dtls";
+        Unity.Services.Multiplayer.RelayProtocol type;
+        if (Application.isEditor) type = Unity.Services.Multiplayer.RelayProtocol.UDP;
+        else if (Application.platform == RuntimePlatform.WebGLPlayer) type = Unity.Services.Multiplayer.RelayProtocol.WSS;
+        else type = Unity.Services.Multiplayer.RelayProtocol.DTLS;
         Debug.Log($"GetConnectionType: {type} platform:{Application.platform}");
         return type;
     }
