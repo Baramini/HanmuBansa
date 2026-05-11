@@ -38,13 +38,11 @@ public class MultiplayPopup : PopupUI
 
         if (string.IsNullOrEmpty(code))
         {
-            UIManager.Instance?.ShowPopup<ErrorMessagePopup>(popup =>
-                popup.ShowMessage("Please enter a room code."));
+            UIManager.Instance?.ShowPopup<ErrorMessagePopup>(popup => popup.ShowMessage("Please enter a room code."));
             return;
         }
 
-        UIManager.Instance?.ShowPopup<StatusMessagePopup>(popup =>
-            popup.ShowMessage("Creating room...", 10f));
+        UIManager.Instance?.ShowPopup<StatusMessagePopup>(popup => popup.ShowMessage("Creating room...", 10f));
 
         _ = MatchManager.Instance?.CreateRoomAsync();
     }
@@ -56,31 +54,26 @@ public class MultiplayPopup : PopupUI
 
         if (string.IsNullOrEmpty(code))
         {
-            UIManager.Instance?.ShowPopup<ErrorMessagePopup>(popup =>
-                popup.ShowMessage("Please enter a room code."));
+            UIManager.Instance?.ShowPopup<ErrorMessagePopup>(popup => popup.ShowMessage("Please enter a room code."));
             return;
         }
 
-        UIManager.Instance?.ShowPopup<StatusMessagePopup>(popup =>
-            popup.ShowMessage("Joining room...", 10f));
+        UIManager.Instance?.ShowPopup<StatusMessagePopup>(popup => popup.ShowMessage("Joining room...", 10f));
 
         _ = MatchManager.Instance?.JoinByCodeAsync(code);
     }
 
     public void OnRandomMatchButton()
     {
-        UIManager.Instance?.ShowPopup<StatusMessagePopup>(popup =>
-            popup.ShowMessage("Finding match...", 10f));
+        UIManager.Instance?.ShowPopup<StatusMessagePopup>(popup => popup.ShowMessage("Finding match...", 10f));
 
         _ = MatchManager.Instance?.AutoMatchAsync();
     }
 
     private void OnRoomCodeGenerated(string code)
     {
-        UIManager.Instance?.GetPopup<StatusMessagePopup>()
-            ?.ShowMessage($"Room Code: {code}", 1f, onClose: () =>
+        UIManager.Instance?.GetPopup<StatusMessagePopup>()?.ShowMessage($"Room Code: {code}", 1f, onClose: () =>
             {
-                // -- Move to lobby after showing code --
                 UIManager.Instance?.HidePopup<MultiplayPopup>();
                 UIManager.Instance?.ShowPopup<LobbyPopup>();
             });
@@ -88,7 +81,6 @@ public class MultiplayPopup : PopupUI
 
     private void OnMatchError(string msg)
     {
-        // -- Close status first, then show error --
         UIManager.Instance?.GetPopup<StatusMessagePopup>()?.OnClose();
         UIManager.Instance?.ShowPopup<ErrorMessagePopup>(popup => popup.ShowMessage(msg));
     }
@@ -98,7 +90,6 @@ public class MultiplayPopup : PopupUI
         UIManager.Instance?.GetPopup<StatusMessagePopup>()
             ?.ShowMessage("Connected!", 1f, onClose: () =>
             {
-                // -- Close multiplayer panel, open lobby --
                 UIManager.Instance?.HidePopup<MultiplayPopup>();
                 UIManager.Instance?.ShowPopup<LobbyPopup>();
             });

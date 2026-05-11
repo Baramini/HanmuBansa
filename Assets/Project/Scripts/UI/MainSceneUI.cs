@@ -5,7 +5,6 @@ public class MainSceneUI : PersistentUI
 {
     public void OnMultiplayButton()
     {
-        // -- Check if name already saved --
         string savedName = PlayerPrefs.GetString("PlayerName", "");
 
         if (string.IsNullOrEmpty(savedName) || savedName.Length < 2)

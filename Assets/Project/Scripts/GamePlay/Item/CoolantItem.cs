@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Coolant: instantly resets overheat to 0.
+// resets overheat 0
 public class CoolantItem : ItemBase
 {
     public override void Apply(GameObject tank)

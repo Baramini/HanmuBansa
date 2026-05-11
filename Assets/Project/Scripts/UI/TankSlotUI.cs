@@ -1,8 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
-// Single tank slot in TankSelectPanel.
 public class TankSlotUI : MonoBehaviour
 {
     [SerializeField] private Button button;
@@ -11,23 +9,14 @@ public class TankSlotUI : MonoBehaviour
 
     public void SetSprite(Sprite sprite)
     {
-        if (tankImage != null)
-            tankImage.sprite = sprite;
+        if (tankImage != null) tankImage.sprite = sprite;
     }
 
     public void Refresh(bool isTaken)
     {
-        // -- Button interactable --
-        if (button != null)
-            button.interactable = !isTaken;
-
-        // -- Taken overlay --
-        if (takenOverlay != null)
-            takenOverlay.SetActive(isTaken);
-
-        // -- Image alpha --
-        if (tankImage != null)
-            tankImage.color = isTaken ? new Color(1f, 1f, 1f, 0.4f) : Color.white;
+        if (button != null) button.interactable = !isTaken;
+        if (takenOverlay != null) takenOverlay.SetActive(isTaken);
+        if (tankImage != null) tankImage.color = isTaken ? new Color(1f, 1f, 1f, 0.4f) : Color.white;
     }
 
     public void SetButtonCallback(System.Action callback)

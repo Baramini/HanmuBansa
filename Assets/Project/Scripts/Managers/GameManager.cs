@@ -8,17 +8,17 @@ public class GameManager : NetworkBehaviour
 {
     public static GameManager Instance { get; private set; }
     public event System.Action OnGameStarted;
-    public bool IsGameStarted => _networkGameStarted.Value;
+    public bool IsGameStarted => networkGameStarted.Value;
 
     [Header("Game Settings")]
     [SerializeField] private float gameDuration = 300f;
     [SerializeField] private float specialItemTime = 180f;
 
-    private NetworkVariable<float> _networkTimer = new NetworkVariable<float>(
+    private NetworkVariable<float> networkTimer = new NetworkVariable<float>(
         0f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-    private NetworkVariable<int> _networkAliveCount = new NetworkVariable<int>(
+    private NetworkVariable<int> networkAliveCount = new NetworkVariable<int>(
         0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-    private NetworkVariable<bool> _networkGameStarted = new NetworkVariable<bool>(
+    private NetworkVariable<bool> networkGameStarted = new NetworkVariable<bool>(
         false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     public event System.Action<float> OnTimerChanged;
@@ -26,27 +26,29 @@ public class GameManager : NetworkBehaviour
     public event System.Action OnSpecialItemSpawn;
     public event System.Action<string> OnGameEnd;
 
-    // -- clientId -> playerName mapping (server only) --
-    private Dictionary<ulong, string> _playerNames = new();
-    private List<TankHealth> _tanks = new();
-    private bool _specialItemWarned = false;
-    private bool _specialItemSpawned = false;
-    private bool _gameEnded = false;
+    private Dictionary<ulong, string> playerNames = new();
+    private List<TankHealth> tanks = new();
+    private bool specialItemWarned = false;
+    private bool specialItemSpawned = false;
+    private bool gameEnded = false;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        if (Instance != null && Instance != this) {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
     }
 
     public override void OnNetworkSpawn()
     {
-        _networkTimer.OnValueChanged += (prev, cur) =>
+        networkTimer.OnValueChanged += (prev, cur) =>
         {
             OnTimerChanged?.Invoke(cur);
             UIManager.Instance?.GetPersistent<HUD>()?.SetTimer(gameDuration - cur);
         };
-        _networkAliveCount.OnValueChanged += (prev, cur) =>
+        networkAliveCount.OnValueChanged += (prev, cur) =>
         {
             OnAliveCountChanged?.Invoke(cur);
             UIManager.Instance?.GetPersistent<HUD>()?.SetAliveCount(cur);
@@ -62,36 +64,31 @@ public class GameManager : NetworkBehaviour
     private System.Collections.IEnumerator InitHUDCoroutine()
     {
         yield return null;
-        UIManager.Instance?.GetPersistent<HUD>()
-            ?.SetTimer(gameDuration - _networkTimer.Value);
-        UIManager.Instance?.GetPersistent<HUD>()
-            ?.SetAliveCount(_networkAliveCount.Value);
+        UIManager.Instance?.GetPersistent<HUD>()?.SetTimer(gameDuration - networkTimer.Value);
+        UIManager.Instance?.GetPersistent<HUD>()?.SetAliveCount(networkAliveCount.Value);
     }
 
-    // -- Called from SpawnManager on server --
-    // playerName: PlayerPrefs name sent from client
     public void SetPlayer(TankHealth tank, ulong clientId, string playerName)
     {
+        // Only server process
         if (!IsServer) return;
 
-        _tanks.Add(tank);
-        _playerNames[clientId] = playerName;
-        _networkAliveCount.Value = _tanks.Count;
-        tank.OnDead += () => OnTankDead(tank, clientId);
-
-        Debug.Log($"Player registered: {playerName} (clientId:{clientId})");
+        tanks.Add(tank);
+        playerNames[clientId] = playerName;
+        networkAliveCount.Value = tanks.Count;
+        tank.OnDead += () => OnTankDead(tank);
     }
 
     public void StartGame()
     {
         if (!IsServer) return;
-        if (_networkGameStarted.Value) return;
+        if (networkGameStarted.Value) return;
 
-        _networkGameStarted.Value = true;
-        _networkTimer.Value = 0f;
-        _gameEnded = false;
-        _specialItemWarned = false;
-        _specialItemSpawned = false;
+        networkGameStarted.Value = true;
+        networkTimer.Value = 0f;
+        gameEnded = false;
+        specialItemWarned = false;
+        specialItemSpawned = false;
 
         NotifyGameStartedClientRpc();
     }
@@ -105,50 +102,51 @@ public class GameManager : NetworkBehaviour
 
     private void Update()
     {
+        // Only server process
         if (!IsServer) return;
-        if (!_networkGameStarted.Value) return;
-        if (_gameEnded) return;
+
+        if (!networkGameStarted.Value) return;
+
+        if (gameEnded) return;
+
         if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening) return;
 
-        _networkTimer.Value += Time.deltaTime;
+        networkTimer.Value += Time.deltaTime;
 
-        if (!_specialItemWarned && _networkTimer.Value >= specialItemTime - 30f)
+        if (!specialItemWarned && networkTimer.Value >= specialItemTime - 30f)
         {
-            _specialItemWarned = true;
+            specialItemWarned = true;
             NotifySpecialItemWarningClientRpc();
         }
 
-        if (!_specialItemSpawned && _networkTimer.Value >= specialItemTime)
+        if (!specialItemSpawned && networkTimer.Value >= specialItemTime)
         {
-            _specialItemSpawned = true;
+            specialItemSpawned = true;
             NotifySpecialItemSpawnClientRpc();
         }
 
-        if (_networkTimer.Value >= gameDuration)
-            EndGame("", true);
+        if (networkTimer.Value >= gameDuration) EndGame("", true);
     }
 
-    private void OnTankDead(TankHealth deadTank, ulong deadClientId)
+    private void OnTankDead(TankHealth deadTank)
     {
+        // Only server process
         if (!IsServer) return;
 
-        _networkAliveCount.Value--;
+        networkAliveCount.Value--;
 
-        // -- Get dead player's NetworkObjectId --
         ulong networkObjectId = deadTank.GetComponent<NetworkObject>().NetworkObjectId;
-        NotifyTankDeadClientRpc(networkObjectId, deadClientId);
+        NotifyTankDeadClientRpc(networkObjectId);
 
-        if (_networkAliveCount.Value <= 1)
+        if (networkAliveCount.Value <= 1)
         {
-            // -- Find winner --
-            TankHealth winnerTank = _tanks.Find(t => !t.IsDead);
-
-            // -- Get winner's clientId and name --
+            // Find winner
+            TankHealth winnerTank = tanks.Find(t => !t.IsDead);
             string winnerName = "";
             if (winnerTank != null)
             {
                 NetworkObject winnerNetObj = winnerTank.GetComponent<NetworkObject>();
-                if (_playerNames.TryGetValue(winnerNetObj.OwnerClientId, out string name))
+                if (playerNames.TryGetValue(winnerNetObj.OwnerClientId, out string name))
                     winnerName = name;
             }
 
@@ -158,12 +156,12 @@ public class GameManager : NetworkBehaviour
 
     private void EndGame(string winnerName, bool isDraw)
     {
-        if (_gameEnded) return;
-        _gameEnded = true;
+        if (gameEnded) return;
+        gameEnded = true;
         EndGameClientRpc(winnerName, isDraw);
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void RequestReturnToLobbyServerRpc()
     {
         MatchManager.Instance?.ReturnToLobby();
@@ -172,33 +170,31 @@ public class GameManager : NetworkBehaviour
     public void ResetGame()
     {
         if (!IsServer) return;
-        _networkGameStarted.Value = false;
-        _networkTimer.Value = 0f;
-        _gameEnded = false;
-        _tanks.Clear();
-        _playerNames.Clear();
+        networkGameStarted.Value = false;
+        networkTimer.Value = 0f;
+        gameEnded = false;
+        tanks.Clear();
+        playerNames.Clear();
     }
 
     [ClientRpc]
-    private void NotifyTankDeadClientRpc(ulong networkObjectId, ulong deadClientId)
+    private void NotifyTankDeadClientRpc(ulong networkObjectId)
     {
-        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects
-            .TryGetValue(networkObjectId, out NetworkObject netObj)) return;
+        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject netObj)) return;
 
         bool isMyTank = netObj.IsOwner;
         netObj.gameObject.SetActive(false);
 
-        if (isMyTank)
-            UIManager.Instance?.ShowPopup<GameOverPopup>(p => p.Setup(false));
+        if (isMyTank) UIManager.Instance?.ShowPopup<GameOverPopup>(p => p.Setup(false));
     }
 
     [ClientRpc]
     private void EndGameClientRpc(string winnerName, bool isDraw)
     {
-        _gameEnded = true;
+        gameEnded = true;
         Time.timeScale = 0f;
 
-        // -- Save record --
+        // Save record
         string localName = PlayerPrefs.GetString("PlayerName", "");
         bool isWinner = !isDraw && winnerName == localName;
 
@@ -206,11 +202,8 @@ public class GameManager : NetworkBehaviour
         else if (isWinner) RecordManager.Instance?.RecordWin();
         else RecordManager.Instance?.RecordLoss();
 
-        // -- Only show ResultPopup if not showing GameOverPopup --
         bool hasGameOver = UIManager.Instance?.IsPopupOpen<GameOverPopup>() ?? false;
-        if (!hasGameOver)
-            UIManager.Instance?.ShowPopup<ResultPopup>(p =>
-                p.SetResult(isDraw ? "Draw" : winnerName));
+        if (!hasGameOver) UIManager.Instance?.ShowPopup<ResultPopup>(p => p.SetResult(isDraw ? "Draw" : winnerName));
     }
 
     [ClientRpc]
@@ -226,6 +219,6 @@ public class GameManager : NetworkBehaviour
         OnSpecialItemSpawn?.Invoke();
     }
 
-    public float GetRemainingTime() => Mathf.Max(0f, gameDuration - _networkTimer.Value);
-    public int GetAliveCount() => _networkAliveCount.Value;
+    public float GetRemainingTime() => Mathf.Max(0f, gameDuration - networkTimer.Value);
+    public int GetAliveCount() => networkAliveCount.Value;
 }

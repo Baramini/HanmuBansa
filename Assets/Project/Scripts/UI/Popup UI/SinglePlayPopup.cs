@@ -14,7 +14,6 @@ public class SingleplayPopup : PopupUI
         difficultyButtons[2]?.onClick.AddListener(OnHardButton);
     }
 
-    // -- Difficulty buttons --
     public void OnEasyButton() => StartSingleplay(Difficulty.Easy);
     public void OnNormalButton() => StartSingleplay(Difficulty.Normal);
     public void OnHardButton() => StartSingleplay(Difficulty.Hard);
@@ -26,8 +25,7 @@ public class SingleplayPopup : PopupUI
 
     private void StartSingleplay(Difficulty difficulty)
     {
-        // -- TODO: start singleplay with selected difficulty --
-        Debug.Log($"Starting singleplay: {difficulty}");
+        // TODO: Feat singleplay
     }
 }
 

@@ -21,20 +21,21 @@ public class TankHealth : NetworkBehaviour
 
     public void TakeDamage(int amount = 1)
     {
-        // -- Damage is only processed on the server --
+        // Only server process
         if (!IsServer) return;
+
         if (IsDead) return;
 
         CurrentHp = Mathf.Max(0, CurrentHp - amount);
 
         if (CurrentHp <= 0)
         {
-            // -- Notify all clients this tank is dead --
+            // Notify all clients death
             DieClientRpc();
         }
         else
         {
-            // -- Notify all clients of damage visual --
+            // Notify all clients damage
             ApplyDamageClientRpc(CurrentHp);
         }
     }
@@ -42,18 +43,14 @@ public class TankHealth : NetworkBehaviour
     [ClientRpc]
     private void ApplyDamageClientRpc(int remainingHp)
     {
-        // -- Update visuals on all clients --
         OnDamaged?.Invoke(remainingHp);
 
-        if (remainingHp == 1 && bodyRenderer != null)
-            bodyRenderer.material = damagedMaterial;
+        if (remainingHp == 1 && bodyRenderer != null) bodyRenderer.material = damagedMaterial;
     }
 
     [ClientRpc]
     private void DieClientRpc()
     {
-        // -- Runs on ALL clients including server --
-        // -- Each client handles death locally --
         IsDead = true;
         OnDead?.Invoke();
     }

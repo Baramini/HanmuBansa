@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Booster: increases move speed by 25% for 15 seconds.
+// increases move speed
 public class BoosterItem : ItemBase
 {
     [SerializeField] private float speedMultiplier = 1.5f;

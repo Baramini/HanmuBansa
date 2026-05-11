@@ -3,9 +3,6 @@ using Unity.Netcode;
 using System.Collections;
 using System.Collections.Generic;
 
-// Manages item spawn timing and positions.
-// Normal items: random item at random position every 20s from game start +20s.
-// Special item: spawned at 3min, position revealed at 2:30.
 public class ItemSpawner : NetworkBehaviour
 {
     [SerializeField] private Transform itemParent;
@@ -25,19 +22,15 @@ public class ItemSpawner : NetworkBehaviour
 
     private void Awake()
     {
-        // -- Collect all children as spawn points --
-        foreach (Transform child in normalSpawnPointsParent)
-            normalSpawnPoints.Add(child);
-
-        foreach (Transform child in specialSpawnPointsParent)
-            specialSpawnPoints.Add(child);
+        foreach (Transform child in normalSpawnPointsParent) normalSpawnPoints.Add(child);
+        foreach (Transform child in specialSpawnPointsParent) specialSpawnPoints.Add(child);
     }
     public override void OnNetworkSpawn()
     {
         if (!IsServer) return;
 
-        // -- Subscribe to game timer events --
-        GameManager.Instance.OnSpecialItemSpawn   += OnSpecialItemSpawn;
+        // Subscribe timer events
+        GameManager.Instance.OnSpecialItemSpawn += OnSpecialItemSpawn;
 
         StartCoroutine(NormalItemSpawnCoroutine());
     }
@@ -48,22 +41,20 @@ public class ItemSpawner : NetworkBehaviour
 
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.OnSpecialItemSpawn   -= OnSpecialItemSpawn;
+            GameManager.Instance.OnSpecialItemSpawn -= OnSpecialItemSpawn;
         }
     }
 
-    // -- Spawn normal item every 20s starting at 20s --
+    // Every 20s starting at 20s
     private IEnumerator NormalItemSpawnCoroutine()
     {
-        // -- Wait until NetworkManager is listening (Host/Server started) --
-        yield return new WaitUntil(() =>
-            NetworkManager.Singleton != null &&
-            NetworkManager.Singleton.IsListening);
+        // Wait until NetworkManager listen
+        yield return new WaitUntil(() => 
+            NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening);
 
-        // -- Then wait for game to start --
+        // Wait until game start
         yield return new WaitUntil(() =>
-            GameManager.Instance != null &&
-            GameManager.Instance.IsGameStarted);
+            GameManager.Instance != null && GameManager.Instance.IsGameStarted);
 
         yield return new WaitForSeconds(spawnInterval);
 
@@ -78,7 +69,7 @@ public class ItemSpawner : NetworkBehaviour
     {
         if (normalItemPrefabs.Count == 0 || normalSpawnPoints.Count == 0) return;
 
-        // -- Pick random item and position --
+        // Random item and position
         int itemIndex  = Random.Range(0, normalItemPrefabs.Count);
         int pointIndex = Random.Range(0, normalSpawnPoints.Count);
 
@@ -89,12 +80,6 @@ public class ItemSpawner : NetworkBehaviour
             itemParent
         );
         obj.GetComponent<NetworkObject>().Spawn();
-    }
-
-    private void OnSpecialItemWarning()
-    {
-        // -- GameManager already handles ClientRpc for banner/marker --
-        // -- Just prepare spawn point marker here if needed --
     }
 
     private void OnSpecialItemSpawn()

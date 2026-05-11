@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class SafeAreaFitter : MonoBehaviour
 {
-    private RectTransform _rectTransform;
+    private RectTransform rectTransform;
 
     private void Awake()
     {
-        _rectTransform = GetComponent<RectTransform>();
+        rectTransform = GetComponent<RectTransform>();
         ApplySafeArea();
     }
 
@@ -18,7 +18,7 @@ public class SafeAreaFitter : MonoBehaviour
         Vector2 anchorMin = safeArea.position / screenSize;
         Vector2 anchorMax = (safeArea.position + safeArea.size) / screenSize;
 
-        _rectTransform.anchorMin = anchorMin;
-        _rectTransform.anchorMax = anchorMax;
+        rectTransform.anchorMin = anchorMin;
+        rectTransform.anchorMax = anchorMax;
     }
 }

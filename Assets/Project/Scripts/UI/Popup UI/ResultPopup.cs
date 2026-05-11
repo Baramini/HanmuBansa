@@ -12,7 +12,6 @@ public class ResultPopup : PopupUI
         if (resultText != null) resultText.text = winnerName == "" ? "DRAW!" : $"Player {winnerName} Win!!!";
     }
 
-    // -- Return to lobby button --
     public void OnReturnToLobbyButton()
     {
         Time.timeScale = 1f;
@@ -21,7 +20,6 @@ public class ResultPopup : PopupUI
         GameManager.Instance?.RequestReturnToLobbyServerRpc();
     }
 
-    // -- Leave button --
     public void OnLeaveButton()
     {
         UIManager.Instance?.ShowPopup<LoadingPopup>();

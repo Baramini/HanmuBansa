@@ -14,17 +14,14 @@ public class TankSelectPopup : PopupUI
     {
         base.Initialize();
 
-        for (int i = 0; i < tankSlots.Count; i++)
-            tankSlots[i]?.SetSprite(TankSpriteContainer.Instance?.GetSprite(i));
-
+        for (int i = 0; i < tankSlots.Count; i++) tankSlots[i]?.SetSprite(TankSpriteContainer.Instance?.GetSprite(i));
         for (int i = 0; i < tankSlots.Count; i++)
         {
             int index = i;
             tankSlots[i]?.SetButtonCallback(() => OnSlotButton(index));
         }
 
-        if (TankSelectManager.Instance != null)
-            TankSelectManager.Instance.OnSelectionChanged += RefreshSlots;
+        if (TankSelectManager.Instance != null) TankSelectManager.Instance.OnSelectionChanged += RefreshSlots;
     }
 
     public override void Show()
@@ -39,18 +36,15 @@ public class TankSelectPopup : PopupUI
 
         TankSelectManager.Instance?.SelectTankServerRpc(index);
 
-        Sprite sprite = index < TankSpriteContainer.Instance?.Count ? TankSpriteContainer.Instance?.GetSprite(index) : null;
+        Sprite sprite = (index < TankSpriteContainer.Instance?.Count) ? TankSpriteContainer.Instance?.GetSprite(index) : null;
         OnTankSelected?.Invoke(sprite, index);
 
         UIManager.Instance?.HidePopup(this);
     }
 
-    // -- Called when any player changes selection --
     private void RefreshSlots()
     {
         if (tankSlots == null) return;
-
-        int mySelection = TankSelectManager.Instance?.GetLocalSelection() ?? -1;
 
         for (int i = 0; i < tankSlots.Count; i++)
         {
@@ -66,8 +60,7 @@ public class TankSelectPopup : PopupUI
 
     public override void Hide()
     {
-        if (TankSelectManager.Instance != null)
-            TankSelectManager.Instance.OnSelectionChanged -= RefreshSlots;
+        if (TankSelectManager.Instance != null) TankSelectManager.Instance.OnSelectionChanged -= RefreshSlots;
 
         base.Hide();
     }

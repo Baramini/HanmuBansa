@@ -1,8 +1,5 @@
-using UnityEngine;
 using Unity.Netcode;
 
-// Attached to tank when shield item is picked up.
-// Reflects the next incoming projectile once, then removes itself.
 public class ShieldEffect : NetworkBehaviour
 {
     public bool IsActive { get; private set; } = false;
@@ -10,15 +7,14 @@ public class ShieldEffect : NetworkBehaviour
     public void Activate()
     {
         IsActive = true;
-        // -- Notify all clients to show shield visual --
+        // Show all clients shield visual
         ActivateClientRpc();
     }
 
-    // -- Called by Projectile when it hits a shielded tank --
     public void ConsumeShield()
     {
         IsActive = false;
-        // -- Notify all clients to hide shield visual --
+        // Show all clients shield visual
         DeactivateClientRpc();
         Destroy(this);
     }
@@ -27,13 +23,13 @@ public class ShieldEffect : NetworkBehaviour
     private void ActivateClientRpc()
     {
         IsActive = true;
-        // -- TODO: show shield visual (attach object to tank) --
+        // TODO: Add shield visual
     }
 
     [ClientRpc]
     private void DeactivateClientRpc()
     {
         IsActive = false;
-        // -- TODO: hide shield visual --
+        // TODO: Add shield visual
     }
 }

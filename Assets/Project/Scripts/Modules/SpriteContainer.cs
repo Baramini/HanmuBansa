@@ -1,57 +1,51 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-// Generic sprite container base class.
-// Uses Dictionary for flexible key-based and index-based lookup.
-
 namespace BrmnModules.DataManagement
 {
     public abstract class SpriteContainer : MonoBehaviour
     {
         [SerializeField] private List<SpriteEntry> entries;
 
-        [System.Serializable]
-        public class SpriteEntry
+        [System.Serializable] public class SpriteEntry
         {
             public string key;
             public Sprite sprite;
         }
 
-        private Dictionary<string, Sprite> _spriteDict;
-        private List<Sprite> _spriteList;
+        private Dictionary<string, Sprite> spriteDict;
+        private List<Sprite> spriteList;
 
         protected virtual void Awake()
         {
-            _spriteDict = new Dictionary<string, Sprite>();
-            _spriteList = new List<Sprite>();
+            spriteDict = new Dictionary<string, Sprite>();
+            spriteList = new List<Sprite>();
 
             foreach (var entry in entries)
             {
                 if (entry.sprite == null) continue;
-                _spriteDict[entry.key] = entry.sprite;
-                _spriteList.Add(entry.sprite);
+                spriteDict[entry.key] = entry.sprite;
+                spriteList.Add(entry.sprite);
             }
         }
 
-        // -- Get by index (existing usage) --
+        // Get by index
         public Sprite GetSprite(int index)
         {
-            if (index < 0 || _spriteList == null || index >= _spriteList.Count)
-                return null;
-            return _spriteList[index];
+            if (index < 0 || spriteList == null || index >= spriteList.Count) return null;
+            return spriteList[index];
         }
 
-        // -- Get by key --
+        // Get by key
         public Sprite GetSprite(string key)
         {
-            if (_spriteDict == null || !_spriteDict.ContainsKey(key))
-                return null;
-            return _spriteDict[key];
+            if (spriteDict == null || !spriteDict.ContainsKey(key)) return null;
+            return spriteDict[key];
         }
 
-        // -- Check if key exists --
-        public bool HasSprite(string key) => _spriteDict?.ContainsKey(key) ?? false;
+        // Find by Key
+        public bool HasSprite(string key) => spriteDict?.ContainsKey(key) ?? false;
 
-        public int Count => _spriteList?.Count ?? 0;
+        public int Count => spriteList?.Count ?? 0;
     }
 }

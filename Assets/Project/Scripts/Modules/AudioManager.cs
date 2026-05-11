@@ -16,22 +16,25 @@ namespace BrmnModules.Audio
 
         [Header("Volume Settings")]
         [SerializeField] private int defaultMasterVolume = 5;
-        [SerializeField] private int defaultBGMVolume = 5;
-        [SerializeField] private int defaultSFXVolume = 5;
+        [SerializeField] private int defaultBgmVolume = 5;
+        [SerializeField] private int defaultSfxVolume = 5;
 
-        // -- 0~10 integer volume --
-        private int _masterVolume;
-        private int _bgmVolume;
-        private int _sfxVolume;
+        // 0~10 int volume --
+        private int masterVolume;
+        private int bgmVolume;
+        private int sfxVolume;
 
-        // -- Convert 0~10 to 0~1 --
-        private float MasterF => _masterVolume / 10f;
-        private float BGMF => _bgmVolume / 10f;
-        private float SFXF => _sfxVolume / 10f;
+        // Convert 0~10 to 0~1 --
+        private float MasterVolume => masterVolume / 10f;
+        private float BgmVolume => bgmVolume / 10f;
+        private float SfxVolume => sfxVolume / 10f;
 
         private void Awake()
         {
-            if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+            if (Instance != null && Instance != this) {
+                Destroy(gameObject);
+                return;
+            }
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
@@ -52,10 +55,7 @@ namespace BrmnModules.Audio
             LoadVolumes();
         }
 
-        // -------------------------------------------------------
-        // -- BGM API --------------------------------------------
-        // -------------------------------------------------------
-
+        // -- BGM API --
         public void PlayBGM(string key, bool loop = true)
         {
             AudioClip clip = bgmData?.Get(key);
@@ -69,7 +69,7 @@ namespace BrmnModules.Audio
 
             bgmSource.clip = clip;
             bgmSource.loop = loop;
-            bgmSource.volume = MasterF * BGMF;
+            bgmSource.volume = MasterVolume * BgmVolume;
             bgmSource.Play();
         }
 
@@ -83,10 +83,7 @@ namespace BrmnModules.Audio
             PlayBGM(key, loop);
         }
 
-        // -------------------------------------------------------
-        // -- SFX API --------------------------------------------
-        // -------------------------------------------------------
-
+        // -- SFX API --
         public void PlaySFX(string key)
         {
             AudioClip clip = sfxData?.Get(key);
@@ -95,66 +92,60 @@ namespace BrmnModules.Audio
                 Debug.LogWarning($"AudioManager: SFX key '{key}' not found.");
                 return;
             }
-            sfxSource.PlayOneShot(clip, MasterF * SFXF);
+            sfxSource.PlayOneShot(clip, MasterVolume * SfxVolume);
         }
 
         public void PlaySFXAtPosition(string key, Vector3 position)
         {
             AudioClip clip = sfxData?.Get(key);
             if (clip == null) return;
-            AudioSource.PlayClipAtPoint(clip, position, MasterF * SFXF);
+            AudioSource.PlayClipAtPoint(clip, position, MasterVolume * SfxVolume);
         }
 
-        // -------------------------------------------------------
-        // -- Volume API -----------------------------------------
-        // -------------------------------------------------------
-
+        // -- Volume API --
         public void SetMasterVolume(int volume)
         {
-            _masterVolume = Mathf.Clamp(volume, 0, 10);
+            masterVolume = Mathf.Clamp(volume, 0, 10);
             ApplyVolumes();
             SaveVolumes();
         }
 
         public void SetBGMVolume(int volume)
         {
-            _bgmVolume = Mathf.Clamp(volume, 0, 10);
-            bgmSource.volume = MasterF * BGMF;
+            bgmVolume = Mathf.Clamp(volume, 0, 10);
+            bgmSource.volume = MasterVolume * BgmVolume;
             SaveVolumes();
         }
 
         public void SetSFXVolume(int volume)
         {
-            _sfxVolume = Mathf.Clamp(volume, 0, 10);
+            sfxVolume = Mathf.Clamp(volume, 0, 10);
             SaveVolumes();
         }
 
-        public int GetMasterVolume() => _masterVolume;
-        public int GetBGMVolume() => _bgmVolume;
-        public int GetSFXVolume() => _sfxVolume;
+        public int GetMasterVolume() => masterVolume;
+        public int GetBGMVolume() => bgmVolume;
+        public int GetSFXVolume() => sfxVolume;
 
-        // -------------------------------------------------------
-        // -- Internal -------------------------------------------
-        // -------------------------------------------------------
-
+        // -- Internal --
         private void ApplyVolumes()
         {
-            bgmSource.volume = MasterF * BGMF;
+            bgmSource.volume = MasterVolume * BgmVolume;
         }
 
         private void SaveVolumes()
         {
-            PlayerPrefs.SetInt("MasterVolume", _masterVolume);
-            PlayerPrefs.SetInt("BGMVolume", _bgmVolume);
-            PlayerPrefs.SetInt("SFXVolume", _sfxVolume);
+            PlayerPrefs.SetInt("MasterVolume", masterVolume);
+            PlayerPrefs.SetInt("BGMVolume", bgmVolume);
+            PlayerPrefs.SetInt("SFXVolume", sfxVolume);
             PlayerPrefs.Save();
         }
 
         private void LoadVolumes()
         {
-            _masterVolume = PlayerPrefs.GetInt("MasterVolume", defaultMasterVolume);
-            _bgmVolume = PlayerPrefs.GetInt("BGMVolume", defaultBGMVolume);
-            _sfxVolume = PlayerPrefs.GetInt("SFXVolume", defaultSFXVolume);
+            masterVolume = PlayerPrefs.GetInt("MasterVolume", defaultMasterVolume);
+            bgmVolume = PlayerPrefs.GetInt("BGMVolume", defaultBgmVolume);
+            sfxVolume = PlayerPrefs.GetInt("SFXVolume", defaultSfxVolume);
             ApplyVolumes();
         }
     }

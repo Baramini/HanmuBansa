@@ -28,22 +28,20 @@ public class LobbyPopup : PopupUI
     [SerializeField] private List<Sprite> mapSprites;
     [SerializeField] private TextMeshProUGUI mapName;
 
-    private int _currentMapIndex = 0;
-    private float _lobbyPollTimer = 0f;
+    private int currentMapIndex = 0;
+    private float lobbyPollTimer = 0f;
     private const float LOBBY_POLL_INTERVAL = 2f;
 
-    private Dictionary<ulong, int> _clientSlotMap = new();
+    private Dictionary<ulong, int> clientSlotMap = new();
 
     public override void Initialize()
     {
         base.Initialize();
 
         var tankSelectPanel = UIManager.Instance?.GetPopup<TankSelectPopup>();
-        if (tankSelectPanel != null)
-            tankSelectPanel.OnTankSelected += OnTankSelectConfirmed;
+        if (tankSelectPanel != null) tankSelectPanel.OnTankSelected += OnTankSelectConfirmed;
 
-        if (TankSelectManager.Instance != null)
-            TankSelectManager.Instance.OnSelectionChanged += OnSelectionChanged;
+        if (TankSelectManager.Instance != null) TankSelectManager.Instance.OnSelectionChanged += OnSelectionChanged;
     }
 
     public override void Show()
@@ -54,15 +52,15 @@ public class LobbyPopup : PopupUI
 
     private void Update()
     {
-        // -- Only non-host clients poll for lobby changes --
+        // Only client
         if (NetworkManager.Singleton == null) return;
         if (NetworkManager.Singleton.IsHost) return;
         if (MatchManager.Instance?.CurrentLobby == null) return;
 
-        _lobbyPollTimer += Time.deltaTime;
-        if (_lobbyPollTimer >= LOBBY_POLL_INTERVAL)
+        lobbyPollTimer += Time.deltaTime;
+        if (lobbyPollTimer >= LOBBY_POLL_INTERVAL)
         {
-            _lobbyPollTimer = 0f;
+            lobbyPollTimer = 0f;
             _ = PollLobbyAsync();
         }
     }
@@ -74,35 +72,26 @@ public class LobbyPopup : PopupUI
 
         try
         {
-            var lobby = await LobbyService.Instance
-                .GetLobbyAsync(MatchManager.Instance.CurrentLobby.Id);
+            var lobby = await LobbyService.Instance.GetLobbyAsync(MatchManager.Instance.CurrentLobby.Id);
 
             if (lobby.Data == null) return;
 
-            bool isRandom = lobby.Data.ContainsKey("IsRandomMap") &&
-                            bool.Parse(lobby.Data["IsRandomMap"].Value);
+            bool isRandom = lobby.Data.ContainsKey("IsRandomMap") && bool.Parse(lobby.Data["IsRandomMap"].Value);
 
             if (lobby.Data.ContainsKey("SelectedMap"))
             {
                 int mapIndex = int.Parse(lobby.Data["SelectedMap"].Value);
 
-                if (isRandom)
-                {
-                    // -- Show random sprite regardless of actual map index --
-                    _currentMapIndex = mapSprites.Count - 1;
-                }
-                else
-                {
-                    _currentMapIndex = mapIndex;
-                }
+                if (isRandom) currentMapIndex = mapSprites.Count - 1;
+                else currentMapIndex = mapIndex;
 
-                UpdateMapPreview(_currentMapIndex);
+                UpdateMapPreview(currentMapIndex);
             }
         }
         catch (LobbyServiceException e)
         {
             Debug.Log($"Lobby no longer exists. Stopping poll. ({e.Message})");
-            _lobbyPollTimer = float.MaxValue;
+            lobbyPollTimer = float.MaxValue;
         }
         catch (System.Exception e)
         {
@@ -119,10 +108,7 @@ public class LobbyPopup : PopupUI
         RefreshMapSelect();
     }
 
-    // -------------------------------------------------------
-    // -- Room Code ------------------------------------------
-    // -------------------------------------------------------
-
+    // -- Room Code --
     private void RefreshRoomCode()
     {
         if (roomCodeText == null) return;
@@ -130,15 +116,12 @@ public class LobbyPopup : PopupUI
         roomCodeText.text = string.IsNullOrEmpty(code) ? "" : $"Room Code: {code}";
     }
 
-    // -------------------------------------------------------
-    // -- Player Slots ---------------------------------------
-    // -------------------------------------------------------
+    // -- Player Slots --
 
     private void ClearAllSlots()
     {
-        _clientSlotMap.Clear();
-        foreach (var slot in playerSlots)
-            slot?.SetEmpty();
+        clientSlotMap.Clear();
+        foreach (var slot in playerSlots) slot?.SetEmpty();
     }
 
     private void OnPlayerJoined(ulong clientId)
@@ -155,11 +138,10 @@ public class LobbyPopup : PopupUI
         string name = GetPlayerName(clientId);
         lobbyLog?.LogLeft(name);
 
-        // -- Clear that player's slot --
-        if (_clientSlotMap.TryGetValue(clientId, out int slotIndex))
+        if (clientSlotMap.TryGetValue(clientId, out int slotIndex))
         {
             playerSlots[slotIndex]?.SetEmpty();
-            _clientSlotMap.Remove(clientId);
+            clientSlotMap.Remove(clientId);
         }
 
         RefreshStartButton();
@@ -167,21 +149,19 @@ public class LobbyPopup : PopupUI
 
     public void OnPlayerLeftNotified(ulong leftClientId)
     {
-        if (_clientSlotMap.TryGetValue(leftClientId, out int slotIndex))
+        if (clientSlotMap.TryGetValue(leftClientId, out int slotIndex))
         {
             playerSlots[slotIndex]?.SetEmpty();
-            _clientSlotMap.Remove(leftClientId);
+            clientSlotMap.Remove(leftClientId);
         }
         RefreshStartButton();
     }
 
     private string GetPlayerName(ulong clientId)
     {
-        // -- TODO: get from Lobby player data --
-        // -- Fallback: use clientId --
+        // Use clientId fallback 
         return clientId == NetworkManager.Singleton.LocalClientId
-            ? PlayerPrefs.GetString("PlayerName", "Me")
-            : $"Player {clientId}";
+            ? PlayerPrefs.GetString("PlayerName", "Me") : $"Player {clientId}";
     }
 
     public void RefreshPlayerSlots()
@@ -190,12 +170,12 @@ public class LobbyPopup : PopupUI
 
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            if (_clientSlotMap.ContainsKey(clientId)) continue;
+            if (clientSlotMap.ContainsKey(clientId)) continue;
 
             int emptySlot = -1;
             for (int i = 0; i < playerSlots.Length; i++)
             {
-                if (!_clientSlotMap.ContainsValue(i))
+                if (!clientSlotMap.ContainsValue(i))
                 {
                     emptySlot = i;
                     break;
@@ -210,24 +190,20 @@ public class LobbyPopup : PopupUI
             string draws = GetPlayerData(lobby, clientId, "Draws", "0");
             string record = $"Win: {wins}  Lose: {losses}  Draw: {draws}";
 
-            bool isHost = NetworkManager.Singleton.IsHost
-                          && clientId == NetworkManager.Singleton.LocalClientId;
+            bool isHost = NetworkManager.Singleton.IsHost && clientId == NetworkManager.Singleton.LocalClientId;
 
             playerSlots[emptySlot]?.SetPlayer(playerName, record, isHost);
-            _clientSlotMap[clientId] = emptySlot;
+            clientSlotMap[clientId] = emptySlot;
         }
     }
 
-    // -- Called when tank selection changes --
+    // When tank selection changed
     private void OnSelectionChanged()
     {
-        foreach (var kvp in _clientSlotMap)
+        foreach (var kvp in clientSlotMap)
         {
-            int tankIndex = TankSelectManager.Instance
-                ?.GetSelectionByClientId(kvp.Key) ?? -1;
-
-            playerSlots[kvp.Value]?.SetTank(
-                TankSpriteContainer.Instance?.GetSprite(tankIndex));
+            int tankIndex = TankSelectManager.Instance?.GetSelectionByClientId(kvp.Key) ?? -1;
+            playerSlots[kvp.Value]?.SetTank(TankSpriteContainer.Instance?.GetSprite(tankIndex));
         }
 
         RefreshStartButton();
@@ -236,9 +212,7 @@ public class LobbyPopup : PopupUI
     private void OnTankSelectConfirmed(Sprite sprite, int index)
     {
         ulong localId = NetworkManager.Singleton.LocalClientId;
-
-        if (_clientSlotMap.TryGetValue(localId, out int slotIndex))
-            playerSlots[slotIndex]?.SetTank(sprite);
+        if (clientSlotMap.TryGetValue(localId, out int slotIndex)) playerSlots[slotIndex]?.SetTank(sprite);
     }
 
     public void OnTankSelectionPopup()
@@ -246,17 +220,14 @@ public class LobbyPopup : PopupUI
         UIManager.Instance?.ShowPopup<TankSelectPopup>();
     }
 
-    // -------------------------------------------------------
-    // -- SELECT MAP -----------------------------------------
-    // -------------------------------------------------------
+    // -- SELECT MAP --
 
     private void RefreshMapSelect()
     {
         bool isHost = NetworkManager.Singleton != null && NetworkManager.Singleton.IsHost;
-        if (mapControlButtons != null)
-            mapControlButtons.SetActive(isHost);
+        if (mapControlButtons != null) mapControlButtons.SetActive(isHost);
 
-        UpdateMapPreview(_currentMapIndex);
+        UpdateMapPreview(currentMapIndex);
     }
 
     private void UpdateMapPreview(int index)
@@ -272,13 +243,11 @@ public class LobbyPopup : PopupUI
     {
         if (!NetworkManager.Singleton.IsHost) return;
 
-        _currentMapIndex = (_currentMapIndex + 1) % mapSprites.Count;
-        UpdateMapPreview(_currentMapIndex);
+        currentMapIndex = (currentMapIndex + 1) % mapSprites.Count;
+        UpdateMapPreview(currentMapIndex);
 
-        bool isRandom = IsRandomIndex(_currentMapIndex);
-        int sendIndex = isRandom
-            ? Random.Range(0, mapSprites.Count - 1)
-            : _currentMapIndex;
+        bool isRandom = IsRandomIndex(currentMapIndex);
+        int sendIndex = isRandom ? Random.Range(0, mapSprites.Count - 1) : currentMapIndex;
 
         _ = MatchManager.Instance?.SetSelectedMapAsync(sendIndex, isRandom);
     }
@@ -287,23 +256,18 @@ public class LobbyPopup : PopupUI
     {
         if (!NetworkManager.Singleton.IsHost) return;
 
-        _currentMapIndex = (_currentMapIndex - 1 + mapSprites.Count) % mapSprites.Count;
-        UpdateMapPreview(_currentMapIndex);
+        currentMapIndex = (currentMapIndex - 1 + mapSprites.Count) % mapSprites.Count;
+        UpdateMapPreview(currentMapIndex);
 
-        bool isRandom = IsRandomIndex(_currentMapIndex);
-        int sendIndex = isRandom
-            ? Random.Range(0, mapSprites.Count - 1)
-            : _currentMapIndex;
+        bool isRandom = IsRandomIndex(currentMapIndex);
+        int sendIndex = isRandom ? Random.Range(0, mapSprites.Count - 1) : currentMapIndex;
 
         _ = MatchManager.Instance?.SetSelectedMapAsync(sendIndex, isRandom);
     }
 
     private bool IsRandomIndex(int index) => index == mapSprites.Count - 1;
 
-    // -------------------------------------------------------
-    // -- Start Button ---------------------------------------
-    // -------------------------------------------------------
-
+    // -- Start Button --
     private void RefreshStartButton()
     {
         bool isHost = NetworkManager.Singleton != null && NetworkManager.Singleton.IsHost;
@@ -319,12 +283,9 @@ public class LobbyPopup : PopupUI
 
         if (startButtonText != null)
         {
-            if (playerCount < 2)
-                startButtonText.text = $"Waiting... ({playerCount}/2)";
-            else if (!allSelected)
-                startButtonText.text = "Waiting for tank selection...";
-            else
-                startButtonText.text = $"Start ({playerCount} players)";
+            if (playerCount < 2) startButtonText.text = $"Waiting... ({playerCount}/2)";
+            else if (!allSelected) startButtonText.text = "Waiting for tank selection...";
+            else startButtonText.text = $"Start ({playerCount} players)";
         }
     }
 
@@ -333,10 +294,7 @@ public class LobbyPopup : PopupUI
         MatchManager.Instance?.RequestStartGame();
     }
 
-    // -------------------------------------------------------
-    // -- Leave ----------------------------------------------
-    // -------------------------------------------------------
-
+    // -- Leave --
     public void OnLeaveButton()
     {
         _ = MatchManager.Instance?.LeaveRoomAsync();
@@ -352,11 +310,9 @@ public class LobbyPopup : PopupUI
     public override void Hide()
     {
         var tankSelectPanel = UIManager.Instance?.GetPopup<TankSelectPopup>();
-        if (tankSelectPanel != null)
-            tankSelectPanel.OnTankSelected -= OnTankSelectConfirmed;
+        if (tankSelectPanel != null) tankSelectPanel.OnTankSelected -= OnTankSelectConfirmed;
 
-        if (TankSelectManager.Instance != null)
-            TankSelectManager.Instance.OnSelectionChanged -= OnSelectionChanged;
+        if (TankSelectManager.Instance != null) TankSelectManager.Instance.OnSelectionChanged -= OnSelectionChanged;
 
         if (NetworkManager.Singleton != null)
         {
@@ -364,14 +320,10 @@ public class LobbyPopup : PopupUI
             NetworkManager.Singleton.OnClientDisconnectCallback -= OnPlayerLeft;
         }
 
-        _lobbyPollTimer = float.MaxValue;
+        lobbyPollTimer = float.MaxValue;
         lobbyLog?.Clear();
         base.Hide();
     }
-
-    // -------------------------------------------------------
-    // -- Helpers --------------------------------------------
-    // -------------------------------------------------------
 
     private string GetPlayerData(Unity.Services.Lobbies.Models.Lobby lobby,
         ulong clientId, string key, string fallback)
@@ -386,9 +338,9 @@ public class LobbyPopup : PopupUI
 
         if (lobby == null) return fallback;
 
-        foreach (var player in lobby.Players)
-            if (player.Data != null && player.Data.ContainsKey(key))
-                return player.Data[key].Value;
+        foreach (var player in lobby.Players) {
+            if (player.Data != null && player.Data.ContainsKey(key)) return player.Data[key].Value;
+        }
 
         return fallback;
     }

@@ -2,15 +2,17 @@ using UnityEngine;
 using Unity.Netcode;
 using BrmnModules.UI;
 
-// Bridge NetworkBehaviour for MatchManager ClientRpc calls.
-// MatchManager is MonoBehaviour so cannot use ClientRpc directly.
+// Bridge NetworkBehaviour by MonoBehaviour
 public class NetworkBridge : NetworkBehaviour
 {
     public static NetworkBridge Instance { get; private set; }
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        if (Instance != null && Instance != this) {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
     }
 
@@ -37,17 +39,14 @@ public class NetworkBridge : NetworkBehaviour
     [ClientRpc]
     public void NotifyPlayerJoinedClientRpc()
     {
-        // -- Notify all clients to refresh lobby --
         var lobbyPopup = UIManager.Instance?.GetPopup<LobbyPopup>();
-        if (lobbyPopup != null && lobbyPopup.gameObject.activeInHierarchy)
-            lobbyPopup.RefreshPlayerSlots();
+        if (lobbyPopup != null && lobbyPopup.gameObject.activeInHierarchy) lobbyPopup.RefreshPlayerSlots();
     }
 
     [ClientRpc]
     public void NotifyPlayerLeftClientRpc(ulong leftClientId)
     {
         var lobbyPopup = UIManager.Instance?.GetPopup<LobbyPopup>();
-        if (lobbyPopup != null && lobbyPopup.gameObject.activeInHierarchy)
-            lobbyPopup.OnPlayerLeftNotified(leftClientId);
+        if (lobbyPopup != null && lobbyPopup.gameObject.activeInHierarchy) lobbyPopup.OnPlayerLeftNotified(leftClientId);
     }
 }

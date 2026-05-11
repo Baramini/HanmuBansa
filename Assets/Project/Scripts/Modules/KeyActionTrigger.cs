@@ -4,8 +4,7 @@ using System.Collections.Generic;
 
 namespace BrmnModules.Common
 {
-    // Maps keyboard keys to UnityActions using Unity Input System.
-    // Configure key bindings and actions in Inspector.
+    // Map keys to UnityActions using Unity Input System
     public class KeyActionTrigger : MonoBehaviour
     {
         [System.Serializable]
@@ -24,8 +23,7 @@ namespace BrmnModules.Common
 
             foreach (var binding in bindings)
             {
-                if (Keyboard.current[binding.key].wasPressedThisFrame)
-                    binding.onPressed?.Invoke();
+                if (Keyboard.current[binding.key].wasPressedThisFrame) binding.onPressed?.Invoke();
             }
         }
     }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BrmnModules.UI
 {
-    // Provides API Only - Logic handled by each UI
+    // API Only
     public class UIManager : MonoBehaviour
     {
         public static UIManager Instance { get; private set; }
@@ -12,19 +12,16 @@ namespace BrmnModules.UI
         [SerializeField] private List<PersistentUI> persistentUIs;
 
         [Header("Popup UI Prefabs")]
-        [SerializeField] private List<PopupUI> popupPrefabs; // Popup UI Prefebs
+        [SerializeField] private List<PopupUI> popupPrefabs;
 
         [Header("Popup Root")]
-        [SerializeField] private Transform popupRoot; // Popup UI's Parent
+        [SerializeField] private Transform popupRoot;
 
         [Header("Backdrop")]
         [SerializeField] private GameObject backdrop;
 
-        // -- Popup UI Caching --
-        private Dictionary<System.Type, PopupUI> _popupCache = new();
-
-        // -- Popup stack --
-        private Stack<PopupUI> _popupStack = new();
+        private Dictionary<System.Type, PopupUI> popupCache = new();
+        private Stack<PopupUI> popupStack = new();
 
         private void Awake()
         {
@@ -40,30 +37,22 @@ namespace BrmnModules.UI
 
         private void InitializeAll()
         {
-            foreach (var ui in persistentUIs)
-                ui?.Initialize();
-
-            if (backdrop != null)
-                backdrop.SetActive(false);
+            foreach (var ui in persistentUIs) ui?.Initialize();
+            if (backdrop != null) backdrop.SetActive(false);
         }
 
-        // -------------------------------------------------------
-        // -- Popup API ------------------------------------------
-        // -------------------------------------------------------
-
+        // -- Popup API --
         public void ShowPopup<T>(System.Action<T> onBeforeShow = null) where T : PopupUI
         {
             T popup = GetPopup<T>();
             if (popup == null) return;
 
-            // -- Action before show --
+            // Action before show
             onBeforeShow?.Invoke(popup);
 
-            if (_popupStack.Count == 0 && backdrop != null)
-                backdrop.SetActive(true);
+            if (popupStack.Count == 0 && backdrop != null) backdrop.SetActive(true);
 
-            if (!_popupStack.Contains(popup))
-                _popupStack.Push(popup);
+            if (!popupStack.Contains(popup)) popupStack.Push(popup);
 
             popup.Show();
         }
@@ -73,41 +62,36 @@ namespace BrmnModules.UI
             T popup = GetPopup<T>();
             if (popup == null) return;
 
-            // -- Remove from stack --
+            // Remove from stack
             RemoveFromStack(popup);
             popup.Hide();
 
-            // -- Hide backdrop if no more popups --
-            if (_popupStack.Count == 0 && backdrop != null)
-                backdrop.SetActive(false);
+            // Hide backdrop if no more popups
+            if (popupStack.Count == 0 && backdrop != null) backdrop.SetActive(false);
         }
         public void HidePopup(PopupUI popup)
         {
             RemoveFromStack(popup);
             popup.Hide();
 
-            if (_popupStack.Count == 0 && backdrop != null)
-                backdrop.SetActive(false);
+            if (popupStack.Count == 0 && backdrop != null) backdrop.SetActive(false);
         }
 
-        // -- Hide top popup (back button behavior) --
         public void HideTopPopup()
         {
-            if (_popupStack.Count == 0) return;
+            if (popupStack.Count == 0) return;
 
-            PopupUI top = _popupStack.Pop();
+            PopupUI top = popupStack.Pop();
             top.Hide();
 
-            if (_popupStack.Count == 0 && backdrop != null)
-                backdrop.SetActive(false);
+            if (popupStack.Count == 0 && backdrop != null) backdrop.SetActive(false);
         }
 
         public T GetPopup<T>() where T : PopupUI
         {
             System.Type type = typeof(T);
 
-            if (_popupCache.TryGetValue(type, out PopupUI cached))
-                return cached as T;
+            if (popupCache.TryGetValue(type, out PopupUI cached)) return cached as T;
 
             // Search Popup
             foreach (var prefab in popupPrefabs)
@@ -116,57 +100,49 @@ namespace BrmnModules.UI
                 {
                     T instance = Instantiate(prefab, popupRoot) as T;
                     instance.Initialize();
-                    _popupCache[type] = instance;
+                    popupCache[type] = instance;
                     return instance;
                 }
             }
 
-            Debug.LogWarning($"UIManager: PopupUI prefab {typeof(T)} not found.");
             return null;
         }
 
         public bool IsPopupOpen<T>() where T : PopupUI
         {
             System.Type type = typeof(T);
-            if (!_popupCache.TryGetValue(type, out PopupUI popup)) return false;
+            if (!popupCache.TryGetValue(type, out PopupUI popup)) return false;
             return popup.gameObject.activeInHierarchy;
         }
 
-        public bool IsAnyPopupOpen => _popupStack.Count > 0;
+        public bool IsAnyPopupOpen => popupStack.Count > 0;
 
         private void RemoveFromStack(PopupUI popup)
         {
-            // -- Rebuild stack without the target popup --
+            // Remake stack
             Stack<PopupUI> temp = new();
 
-            while (_popupStack.Count > 0)
+            while (popupStack.Count > 0)
             {
-                PopupUI top = _popupStack.Pop();
+                PopupUI top = popupStack.Pop();
                 if (top != popup) temp.Push(top);
             }
 
-            while (temp.Count > 0) _popupStack.Push(temp.Pop());
+            while (temp.Count > 0) popupStack.Push(temp.Pop());
         }
 
-        // -------------------------------------------------------
-        // -- Persistent API -------------------------------------
-        // -------------------------------------------------------
-
+        // -- Persistent API --
         public T GetPersistent<T>() where T : PersistentUI
         {
             foreach (var ui in persistentUIs)
             {
-                if (ui is T target)
-                    return target;
+                if (ui is T target) return target;
             }
-            Debug.LogWarning($"UIManager: PersistentUI of type {typeof(T)} not found.");
+
             return null;
         }
 
-        // -------------------------------------------------------
-        // -- Internal -------------------------------------------
-        // -------------------------------------------------------
-
+        // -- Internal --
         public void ShowSettingsPopup()
         {
             if (!IsPopupOpen<SettingsPopup>()) ShowPopup<SettingsPopup>();

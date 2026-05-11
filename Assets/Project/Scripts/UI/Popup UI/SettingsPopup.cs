@@ -37,12 +37,9 @@ public class SettingsPopup : PopupUI
         sfxSlider?.onValueChanged.RemoveListener(OnSFXChanged);
         bgmSlider?.onValueChanged.RemoveListener(OnBGMChanged);
 
-        if (masterSlider != null)
-            masterSlider.value = AudioManager.Instance?.GetMasterVolume() ?? 5;
-        if (sfxSlider != null)
-            sfxSlider.value = AudioManager.Instance?.GetSFXVolume() ?? 5;
-        if (bgmSlider != null)
-            bgmSlider.value = AudioManager.Instance?.GetBGMVolume() ?? 5;
+        if (masterSlider != null) masterSlider.value = AudioManager.Instance?.GetMasterVolume() ?? 5;
+        if (sfxSlider != null) sfxSlider.value = AudioManager.Instance?.GetSFXVolume() ?? 5;
+        if (bgmSlider != null) bgmSlider.value = AudioManager.Instance?.GetBGMVolume() ?? 5;
 
         masterSlider?.onValueChanged.AddListener(OnMasterChanged);
         sfxSlider?.onValueChanged.AddListener(OnSFXChanged);
@@ -56,12 +53,9 @@ public class SettingsPopup : PopupUI
         base.OnCloseButton();
     }
 
-    private void OnMasterChanged(float value)
-        => AudioManager.Instance?.SetMasterVolume((int)value);
+    private void OnMasterChanged(float value) => AudioManager.Instance?.SetMasterVolume((int)value);
 
-    private void OnSFXChanged(float value)
-        => AudioManager.Instance?.SetSFXVolume((int)value);
+    private void OnSFXChanged(float value) => AudioManager.Instance?.SetSFXVolume((int)value);
 
-    private void OnBGMChanged(float value)
-        => AudioManager.Instance?.SetBGMVolume((int)value);
+    private void OnBGMChanged(float value) => AudioManager.Instance?.SetBGMVolume((int)value);
 }

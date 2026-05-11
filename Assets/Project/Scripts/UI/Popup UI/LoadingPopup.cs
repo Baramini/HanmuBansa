@@ -8,18 +8,17 @@ public class LoadingPopup : PopupUI
     [SerializeField] private TextMeshProUGUI loadingText;
     [SerializeField] private float dotInterval = 0.5f;
 
-    private Coroutine _dotCoroutine;
+    private Coroutine dotCoroutine;
 
     public override void Show()
     {
         base.Show();
-        _dotCoroutine = StartCoroutine(AnimateDotsCoroutine());
+        dotCoroutine = StartCoroutine(AnimateDotsCoroutine());
     }
 
     public override void Hide()
     {
-        if (_dotCoroutine != null)
-            StopCoroutine(_dotCoroutine);
+        if (dotCoroutine != null) StopCoroutine(dotCoroutine);
 
         base.Hide();
     }
@@ -30,8 +29,7 @@ public class LoadingPopup : PopupUI
         while (true)
         {
             dots = (dots % 3) + 1;
-            if (loadingText != null)
-                loadingText.text = "Loading" + new string('.', dots);
+            if (loadingText != null) loadingText.text = "Loading" + new string('.', dots);
 
             yield return new WaitForSecondsRealtime(dotInterval);
         }

@@ -12,16 +12,14 @@ public class ErrorMessagePopup : PopupUI
 
     public void ShowMessage(string message)
     {
-        if (messageText != null)
-            messageText.text = message;
+        if (messageText != null) messageText.text = message;
 
         base.Show();
     }
 
     public void ShowMessage(string message, UnityEngine.Events.UnityAction onClose = null)
     {
-        if (messageText != null)
-            messageText.text = message;
+        if (messageText != null) messageText.text = message;
 
         base.Show();
 

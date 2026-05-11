@@ -8,32 +8,26 @@ public class StatusMessagePopup : PopupUI
 {
     [SerializeField] private TextMeshProUGUI messageText;
     
-    private Coroutine _autoCloseCoroutine;
+    private Coroutine autoCloseCoroutine;
 
     public override void OnCloseButton() { }
 
-    // -- Show with duration and optional callback on close --
     public void ShowMessage(string message, float duration, Action onClose = null)
     {
-        if (messageText != null)
-            messageText.text = message;
-
-        // -- Cancel previous coroutine if running --
-        if (_autoCloseCoroutine != null)
-            StopCoroutine(_autoCloseCoroutine);
+        if (messageText != null) messageText.text = message;
+        if (autoCloseCoroutine != null) StopCoroutine(autoCloseCoroutine);
 
         base.Show();
 
-        _autoCloseCoroutine = StartCoroutine(AutoCloseCoroutine(duration, onClose));
+        autoCloseCoroutine = StartCoroutine(AutoCloseCoroutine(duration, onClose));
     }
 
     public void OnClose()
     {
-        if (_autoCloseCoroutine != null)
-            StopCoroutine(_autoCloseCoroutine);
+        if (autoCloseCoroutine != null) StopCoroutine(autoCloseCoroutine);
         
         UIManager.Instance?.HidePopup(this);
-        _autoCloseCoroutine = null;
+        autoCloseCoroutine = null;
     }
 
     private IEnumerator AutoCloseCoroutine(float duration, Action onClose)
@@ -42,6 +36,6 @@ public class StatusMessagePopup : PopupUI
         onClose?.Invoke();
         
         UIManager.Instance?.HidePopup(this);
-        _autoCloseCoroutine = null;
+        autoCloseCoroutine = null;
     }
 }

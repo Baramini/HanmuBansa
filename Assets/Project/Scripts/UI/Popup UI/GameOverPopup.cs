@@ -12,57 +12,51 @@ public class GameOverPopup : PopupUI
     [SerializeField] private Button spectateButton;
     [SerializeField] private Button nextPlayerButton;
 
-    private CinemachineCamera _cinemachineCamera;
-    private List<GameObject> _aliveTanks = new();
-    private int _spectateIndex = 0;
-    private bool _isSpectating = false;
+    private CinemachineCamera cinemachineCamera;
+    private List<GameObject> aliveTanks = new();
+    private int spectateIndex = 0;
+    private bool isSpectating = false;
 
     public override void Initialize()
     {
         base.Initialize();
-        _cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
+        cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
     }
 
     public void Setup(bool isWinner)
     {
-        if (messageText != null)
-            messageText.text = "You are dead";
+        if (messageText != null) messageText.text = "You are dead";
 
-        // -- Collect alive tanks --
         RefreshAliveTanks();
 
-        // -- Show spectate button only if there are alive players --
-        if (spectateButton != null)
-            spectateButton.gameObject.SetActive(_aliveTanks.Count > 0);
+        // Show spectate button only game not end
+        if (spectateButton != null) spectateButton.gameObject.SetActive(aliveTanks.Count > 0);
 
-        if (nextPlayerButton != null)
-            nextPlayerButton.gameObject.SetActive(false);
+        if (nextPlayerButton != null) nextPlayerButton.gameObject.SetActive(false);
     }
 
-    // -- Spectate button --
     public void OnSpectateButton()
     {
-        if (_aliveTanks.Count == 0) return;
+        if (aliveTanks.Count == 0) return;
 
-        _isSpectating = true;
-        _spectateIndex = 0;
+        isSpectating = true;
+        spectateIndex = 0;
 
-        SetCameraTarget(_aliveTanks[_spectateIndex]);
+        SetCameraTarget(aliveTanks[spectateIndex]);
     }
 
-    // -- Next player button --
+    // Next player button
     public void OnNextPlayerButton()
     {
         RefreshAliveTanks();
-        if (_aliveTanks.Count == 0) return;
+        if (aliveTanks.Count == 0) return;
 
-        _spectateIndex = (_spectateIndex + 1) % _aliveTanks.Count;
-        SetCameraTarget(_aliveTanks[_spectateIndex]);
+        spectateIndex = (spectateIndex + 1) % aliveTanks.Count;
+        SetCameraTarget(aliveTanks[spectateIndex]);
     }
 
     public void OnLeaveButton()
     {
-        // -- Show loading then return to main menu --
         UIManager.Instance?.ShowPopup<LoadingPopup>();
 
         _ = LeaveAndLoadMainMenuAsync();
@@ -74,19 +68,18 @@ public class GameOverPopup : PopupUI
 
         await MatchManager.Instance?.LeaveRoomAsync();
 
-        // -- Load main menu --
         UnityEngine.SceneManagement.SceneManager.LoadScene(0);
     }
 
     private void SetCameraTarget(GameObject tank)
     {
-        if (_cinemachineCamera == null || tank == null) return;
-        _cinemachineCamera.Follow = tank.transform;
+        if (cinemachineCamera == null || tank == null) return;
+        cinemachineCamera.Follow = tank.transform;
     }
 
     private void RefreshAliveTanks()
     {
-        _aliveTanks.Clear();
+        aliveTanks.Clear();
 
         foreach (var client in NetworkManager.Singleton.ConnectedClients)
         {
@@ -94,8 +87,7 @@ public class GameOverPopup : PopupUI
             if (playerObj == null) continue;
 
             TankHealth health = playerObj.GetComponentInChildren<TankHealth>();
-            if (health != null && !health.IsDead)
-                _aliveTanks.Add(playerObj);
+            if (health != null && !health.IsDead) aliveTanks.Add(playerObj);
         }
     }
 }

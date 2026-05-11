@@ -11,9 +11,8 @@ using System.Collections;
 using System.Collections.Generic;
 using BrmnModules.UI;
 
-// Manages room creation, joining, auto-matching, and scene transitions.
+// Manages room create, join, auto-match, scene transition
 // Uses UGS Lobby + Relay for P2P connection without dedicated server.
-// Inherits MonoBehaviour (not NetworkBehaviour) to avoid NGO lifecycle issues.
 public class MatchManager : MonoBehaviour
 {
     public static MatchManager Instance { get; private set; }
@@ -25,25 +24,25 @@ public class MatchManager : MonoBehaviour
     private const int MAX_PLAYERS = 4;
     private const string RELAY_CODE_KEY = "RelayCode";
 
-    private Lobby _currentLobby = null;
-    private Coroutine _heartbeatCoroutine = null;
-    private bool _isLeavingIntentionally = false;
-    private bool _isReturningToLobby = false;
+    private Lobby currentLobby = null;
+    private Coroutine heartbeatCoroutine = null;
+    private bool isLeavingIntentionally = false;
+    private bool isReturningToLobby = false;
 
-    public string CurrentLobbyCode => _currentLobby?.LobbyCode ?? "";
-    public Lobby CurrentLobby => _currentLobby;
+    public string CurrentLobbyCode => currentLobby?.LobbyCode ?? "";
+    public Lobby CurrentLobby => currentLobby;
 
     public event System.Action<string> OnMatchError;
     public event System.Action<string> OnRoomCodeGenerated;
     public event System.Action OnMatchStarted;
 
-    // -------------------------------------------------------
-    // -- Lifecycle ------------------------------------------
-    // -------------------------------------------------------
-
+    // -- Lifecycle --
     private void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        if (Instance != null && Instance != this) {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
@@ -56,8 +55,7 @@ public class MatchManager : MonoBehaviour
     private IEnumerator InitializeCoroutine()
     {
         yield return new WaitUntil(() =>
-            NetworkManager.Singleton != null &&
-            NetworkManager.Singleton.SceneManager != null);
+            NetworkManager.Singleton != null && NetworkManager.Singleton.SceneManager != null);
 
         NetworkManager.Singleton.OnClientStopped += OnClientStopped;
         NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += OnSceneLoadCompleted;
@@ -67,6 +65,7 @@ public class MatchManager : MonoBehaviour
 
     private void OnClientConnected(ulong clientId)
     {
+        // Only server process
         if (!NetworkManager.Singleton.IsServer) return;
 
         NetworkBridge.Instance?.NotifyPlayerJoinedClientRpc();
@@ -74,6 +73,7 @@ public class MatchManager : MonoBehaviour
 
     private void OnClientDisconnected(ulong clientId)
     {
+        // Only server process
         if (!NetworkManager.Singleton.IsServer) return;
 
         NetworkBridge.Instance?.NotifyPlayerLeftClientRpc(clientId);
@@ -84,47 +84,36 @@ public class MatchManager : MonoBehaviour
         if (NetworkManager.Singleton != null)
         {
             NetworkManager.Singleton.OnClientStopped -= OnClientStopped;
-
             if (NetworkManager.Singleton.SceneManager != null)
-                NetworkManager.Singleton.SceneManager.OnLoadEventCompleted
-                    -= OnSceneLoadCompleted;
+                NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= OnSceneLoadCompleted;
         }
 
-        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)
-            _ = LeaveRoomAsync();
+        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening) _ = LeaveRoomAsync();
     }
 
-    // -------------------------------------------------------
-    // -- Scene Load Completed -------------------------------
-    // -------------------------------------------------------
-
-    private void OnSceneLoadCompleted(string sceneName,
-        UnityEngine.SceneManagement.LoadSceneMode loadSceneMode,
-        List<ulong> clientsCompleted,
-        List<ulong> clientsTimedOut)
+    // -- Scene Load Completed --
+    private void OnSceneLoadCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode,
+        List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
-        Debug.Log($"OnSceneLoadCompleted: {sceneName}");
-
         if (sceneName == MAIN_MENU_SCENE)
         {
-            if (_currentLobby != null && _isReturningToLobby)
+            if (currentLobby != null && isReturningToLobby)
             {
-                _isReturningToLobby = false;
+                isReturningToLobby = false;
                 OpenLobbyOnAllClients();
             }
         }
         else
         {
-            // -- Map scene loaded --
+            // Only server process
             if (!NetworkManager.Singleton.IsServer) return;
-
             StartCoroutine(SpawnAndStartCoroutine());
         }
     }
 
     private IEnumerator SpawnAndStartCoroutine()
     {
-        // -- Wait for SpawnManager and GameManager to be ready --
+        // Wait SpawnManager and GameManager
         SpawnManager spawnManager = null;
         yield return new WaitUntil(() =>
         {
@@ -132,50 +121,39 @@ public class MatchManager : MonoBehaviour
             return spawnManager != null && GameManager.Instance != null;
         });
 
-        Debug.Log("Spawning players and starting game...");
         spawnManager.SpawnAllPlayers();
         GameManager.Instance.StartGame();
     }
 
-    // -- Cannot use ClientRpc (not NetworkBehaviour) --
-    // -- Use NetworkManager to find MatchManagerNetworkBridge instead --
     private void OpenLobbyOnAllClients()
     {
         NetworkBridge.Instance?.OpenLobbyClientRpc();
     }
 
-    // -------------------------------------------------------
-    // -- CREATE ROOM (Host) ---------------------------------
-    // -------------------------------------------------------
-
+    // -- CREATE ROOM (Host) --
     public async Task CreateRoomAsync()
     {
         try
         {
-            Allocation allocation = await RelayService.Instance
-                .CreateAllocationAsync(MAX_PLAYERS - 1);
-
-            string relayCode = await RelayService.Instance
-                .GetJoinCodeAsync(allocation.AllocationId);
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(MAX_PLAYERS - 1);
+            string relayCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 
             CreateLobbyOptions options = new CreateLobbyOptions
             {
                 IsPrivate = false,
                 Data = new Dictionary<string, DataObject>
                 {
-                    { RELAY_CODE_KEY, new DataObject(
-                        DataObject.VisibilityOptions.Public, relayCode) }
+                    { RELAY_CODE_KEY, new DataObject(DataObject.VisibilityOptions.Public, relayCode) }
                 },
                 Player = new Player(data: GetLocalPlayerData())
             };
 
-            _currentLobby = await LobbyService.Instance
-                .CreateLobbyAsync("HanmuRoom", MAX_PLAYERS, options);
-
-            _heartbeatCoroutine = StartCoroutine(HeartbeatCoroutine());
+            currentLobby = await LobbyService.Instance.CreateLobbyAsync("HanmuRoom", MAX_PLAYERS, options);
+            heartbeatCoroutine = StartCoroutine(HeartbeatCoroutine());
 
             SetupTransport();
             Unity.Services.Multiplayer.RelayProtocol connectionType = GetConnectionType();
+            // UDP can only be used create `relayServerData`
             if (connectionType == Unity.Services.Multiplayer.RelayProtocol.UDP)
             {
                 var relayServerData = new RelayServerData(
@@ -188,17 +166,15 @@ public class MatchManager : MonoBehaviour
                     false
                 );
 
-                NetworkManager.Singleton.GetComponent<UnityTransport>()
-                .SetRelayServerData(relayServerData);
+                NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
                 NetworkManager.Singleton.StartHost();
-            }
+            } // wss, dtls can only be used do not create `relayServerData`(I dont know why...)
             else
             {
-                NetworkManager.Singleton.GetComponent<UnityTransport>()
-                   .SetRelayServerData(AllocationUtils.ToRelayServerData(allocation, connectionType));
+                NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(AllocationUtils.ToRelayServerData(allocation, connectionType));
                 NetworkManager.Singleton.StartHost();
             }
-            OnRoomCodeGenerated?.Invoke(_currentLobby.LobbyCode);
+            OnRoomCodeGenerated?.Invoke(currentLobby.LobbyCode);
         }
         catch (System.Exception e)
         {
@@ -207,9 +183,7 @@ public class MatchManager : MonoBehaviour
         }
     }
 
-    // -------------------------------------------------------
-    // -- JOIN BY CODE (Client) ------------------------------
-    // -------------------------------------------------------
+    // -- JOIN BY CODE (Client) --
 
     public async Task JoinByCodeAsync(string lobbyCode)
     {
@@ -220,12 +194,10 @@ public class MatchManager : MonoBehaviour
                 Player = new Player(data: GetLocalPlayerData())
             };
 
-            _currentLobby = await LobbyService.Instance
-                .JoinLobbyByCodeAsync(lobbyCode.ToUpper(), joinOptions);
+            currentLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode.ToUpper(), joinOptions);
 
-            string relayCode = _currentLobby.Data[RELAY_CODE_KEY].Value;
-            JoinAllocation joinAllocation = await RelayService.Instance
-                .JoinAllocationAsync(relayCode);
+            string relayCode = currentLobby.Data[RELAY_CODE_KEY].Value;
+            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(relayCode);
 
             SetupTransport();
             Unity.Services.Multiplayer.RelayProtocol connectionType = GetConnectionType();
@@ -241,19 +213,16 @@ public class MatchManager : MonoBehaviour
                     false
                 );
 
-                NetworkManager.Singleton.GetComponent<UnityTransport>()
-                .SetRelayServerData(relayServerData);
+                NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
                 NetworkManager.Singleton.StartClient();
             }
             else
             {
-                NetworkManager.Singleton.GetComponent<UnityTransport>()
-                .SetRelayServerData(AllocationUtils.ToRelayServerData(joinAllocation, connectionType));
+                NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(AllocationUtils.ToRelayServerData(joinAllocation, connectionType));
                 NetworkManager.Singleton.StartClient();
             }
 
             OnMatchStarted?.Invoke();
-            Debug.Log($"Joined room: {lobbyCode}");
         }
         catch (System.Exception e)
         {
@@ -262,20 +231,15 @@ public class MatchManager : MonoBehaviour
         }
     }
 
-    // -------------------------------------------------------
-    // -- AUTO MATCH -----------------------------------------
-    // -------------------------------------------------------
-
+    // -- AUTO MATCH --
     public async Task AutoMatchAsync()
     {
         try
         {
-            _currentLobby = await LobbyService.Instance
-                .QuickJoinLobbyAsync(new QuickJoinLobbyOptions());
+            currentLobby = await LobbyService.Instance.QuickJoinLobbyAsync(new QuickJoinLobbyOptions());
 
-            string relayCode = _currentLobby.Data[RELAY_CODE_KEY].Value;
-            JoinAllocation joinAllocation = await RelayService.Instance
-                .JoinAllocationAsync(relayCode);
+            string relayCode = currentLobby.Data[RELAY_CODE_KEY].Value;
+            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(relayCode);
 
             SetupTransport();
             Unity.Services.Multiplayer.RelayProtocol connectionType = GetConnectionType();
@@ -291,19 +255,16 @@ public class MatchManager : MonoBehaviour
                     false
                 );
 
-                NetworkManager.Singleton.GetComponent<UnityTransport>()
-                .SetRelayServerData(relayServerData);
+                NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
                 NetworkManager.Singleton.StartClient();
             }
             else
             {
-                NetworkManager.Singleton.GetComponent<UnityTransport>()
-                .SetRelayServerData(AllocationUtils.ToRelayServerData(joinAllocation, connectionType));
+                NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(AllocationUtils.ToRelayServerData(joinAllocation, connectionType));
                 NetworkManager.Singleton.StartClient();
             }
 
             OnMatchStarted?.Invoke();
-            Debug.Log("Auto match: joined existing room.");
         }
         catch (LobbyServiceException)
         {
@@ -317,26 +278,14 @@ public class MatchManager : MonoBehaviour
         }
     }
 
-    // -------------------------------------------------------
-    // -- START GAME -----------------------------------------
-    // -------------------------------------------------------
-
+    // -- START GAME --
     public void RequestStartGame()
     {
         if (!NetworkManager.Singleton.IsServer) return;
 
         int playerCount = NetworkManager.Singleton.ConnectedClients.Count;
-        if (playerCount < 2)
-        {
-            Debug.Log("Need at least 2 players to start.");
-            return;
-        }
-
-        if (!TankSelectManager.Instance.AllPlayersSelected())
-        {
-            Debug.Log("Not all players have selected a tank.");
-            return;
-        }
+        if (playerCount < 2) return;
+        if (!TankSelectManager.Instance.AllPlayersSelected()) return;
 
         NetworkBridge.Instance?.ShowLoadingClientRpc();
 
@@ -350,24 +299,19 @@ public class MatchManager : MonoBehaviour
         int mapIndex = GetSelectedMapIndex();
         string sceneName = mapIndex == 0 ? MAP_WAREHOUSE : MAP_ARENA;
 
-        Debug.Log($"Loading scene: {sceneName}");
-
         NetworkManager.Singleton.SceneManager.LoadScene(
             sceneName,
             UnityEngine.SceneManagement.LoadSceneMode.Single
         );
     }
 
-    // -------------------------------------------------------
-    // -- RETURN TO LOBBY ------------------------------------
-    // -------------------------------------------------------
-
+    // -- RETURN TO LOBBY --
     public void ReturnToLobby()
     {
         if (!NetworkManager.Singleton.IsServer) return;
 
         Time.timeScale = 1f;
-        _isReturningToLobby = true;
+        isReturningToLobby = true;
 
         NetworkManager.Singleton.SceneManager.LoadScene(
             MAIN_MENU_SCENE,
@@ -375,34 +319,26 @@ public class MatchManager : MonoBehaviour
         );
     }
 
-    // -------------------------------------------------------
-    // -- LEAVE ROOM -----------------------------------------
-    // -------------------------------------------------------
+    // -- LEAVE ROOM --
 
     public async Task LeaveRoomAsync()
     {
-        _isLeavingIntentionally = true;
+        isLeavingIntentionally = true;
 
         try
         {
-            if (GameManager.Instance != null)
-                GameManager.Instance.ResetGame();
+            if (GameManager.Instance != null) GameManager.Instance.ResetGame();
 
-            if (_heartbeatCoroutine != null)
-                StopCoroutine(_heartbeatCoroutine);
+            if (heartbeatCoroutine != null) StopCoroutine(heartbeatCoroutine);
 
-            if (_currentLobby == null) return;
+            if (currentLobby == null) return;
 
-            string playerId = Unity.Services.Authentication
-                .AuthenticationService.Instance.PlayerId;
+            string playerId = Unity.Services.Authentication.AuthenticationService.Instance.PlayerId;
 
-            if (_currentLobby.HostId == playerId)
-                await LobbyService.Instance.DeleteLobbyAsync(_currentLobby.Id);
-            else
-                await LobbyService.Instance
-                    .RemovePlayerAsync(_currentLobby.Id, playerId);
+            if (currentLobby.HostId == playerId) await LobbyService.Instance.DeleteLobbyAsync(currentLobby.Id);
+            else await LobbyService.Instance.RemovePlayerAsync(currentLobby.Id, playerId);
 
-            _currentLobby = null;
+            currentLobby = null;
             NetworkManager.Singleton.Shutdown();
         }
         catch (System.Exception e)
@@ -411,17 +347,15 @@ public class MatchManager : MonoBehaviour
         }
     }
 
-    // -------------------------------------------------------
-    // -- FORCE LEAVE ----------------------------------------
-    // -------------------------------------------------------
+    // -- FORCE LEAVE --
 
     private void OnClientStopped(bool isHost)
     {
         if (isHost) return;
 
-        if (_isLeavingIntentionally)
+        if (isLeavingIntentionally)
         {
-            _isLeavingIntentionally = false;
+            isLeavingIntentionally = false;
             return;
         }
 
@@ -430,14 +364,12 @@ public class MatchManager : MonoBehaviour
 
     private async Task ForceLeaveAsync()
     {
-        if (_currentLobby != null)
+        if (currentLobby != null)
         {
             try
             {
-                string playerId = Unity.Services.Authentication
-                    .AuthenticationService.Instance.PlayerId;
-                await LobbyService.Instance
-                    .RemovePlayerAsync(_currentLobby.Id, playerId);
+                string playerId = Unity.Services.Authentication.AuthenticationService.Instance.PlayerId;
+                await LobbyService.Instance.RemovePlayerAsync(currentLobby.Id, playerId);
             }
             catch (LobbyServiceException)
             {
@@ -447,12 +379,10 @@ public class MatchManager : MonoBehaviour
             {
                 Debug.LogError($"ForceLeave error: {e.Message}");
             }
-            _currentLobby = null;
+            currentLobby = null;
         }
 
-        if (NetworkManager.Singleton.IsConnectedClient ||
-            NetworkManager.Singleton.IsListening)
-            NetworkManager.Singleton.Shutdown();
+        if (NetworkManager.Singleton.IsConnectedClient || NetworkManager.Singleton.IsListening) NetworkManager.Singleton.Shutdown();
 
         Time.timeScale = 1f;
 
@@ -465,42 +395,36 @@ public class MatchManager : MonoBehaviour
             : "Host has disconnected.\nReturning to main menu.";
 
         UIManager.Instance?.ShowPopup<ErrorMessagePopup>(p =>
-            p.ShowMessage(message, onClose: () =>
-                UnityEngine.SceneManagement.SceneManager.LoadScene(0)));
+            p.ShowMessage(message, onClose: () => UnityEngine.SceneManagement.SceneManager.LoadScene(0)));
     }
 
-    // -------------------------------------------------------
-    // -- MAP SELECT -----------------------------------------
-    // -------------------------------------------------------
+    // -- MAP SELECT --
 
     private const string MAP_KEY = "SelectedMap";
     private const string MAP_RANDOM_KEY = "IsRandomMap";
 
     public async Task SetSelectedMapAsync(int mapIndex, bool isRandom = false)
     {
-        if (_currentLobby == null) return;
+        if (currentLobby == null) return;
 
         try
         {
-            UpdateLobbyOptions options = new UpdateLobbyOptions
-            {
+            UpdateLobbyOptions options = new UpdateLobbyOptions {
                 Data = new Dictionary<string, DataObject>
-            {
-                { RELAY_CODE_KEY, new DataObject(
-                    DataObject.VisibilityOptions.Public,
-                    _currentLobby.Data[RELAY_CODE_KEY].Value) },
-                { MAP_KEY, new DataObject(
-                    DataObject.VisibilityOptions.Member,
-                    mapIndex.ToString()) },
-                // -- Store random flag separately --
-                { MAP_RANDOM_KEY, new DataObject(
-                    DataObject.VisibilityOptions.Member,
-                    isRandom.ToString()) }
-            }
+                {
+                    { RELAY_CODE_KEY, new DataObject(
+                        DataObject.VisibilityOptions.Public,
+                        currentLobby.Data[RELAY_CODE_KEY].Value) },
+                    { MAP_KEY, new DataObject(
+                        DataObject.VisibilityOptions.Member,
+                        mapIndex.ToString()) },
+                    { MAP_RANDOM_KEY, new DataObject(
+                        DataObject.VisibilityOptions.Member,
+                        isRandom.ToString()) }
+                }
             };
 
-            _currentLobby = await LobbyService.Instance
-                .UpdateLobbyAsync(_currentLobby.Id, options);
+            currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, options);
         }
         catch (System.Exception e)
         {
@@ -510,81 +434,40 @@ public class MatchManager : MonoBehaviour
 
     public bool GetIsRandomMap()
     {
-        if (_currentLobby?.Data == null) return false;
-        if (!_currentLobby.Data.ContainsKey(MAP_RANDOM_KEY)) return false;
-        return bool.Parse(_currentLobby.Data[MAP_RANDOM_KEY].Value);
+        if (currentLobby?.Data == null) return false;
+        if (!currentLobby.Data.ContainsKey(MAP_RANDOM_KEY)) return false;
+        return bool.Parse(currentLobby.Data[MAP_RANDOM_KEY].Value);
     }
 
     public int GetSelectedMapIndex()
     {
-        if (_currentLobby?.Data == null) return 0;
-        if (!_currentLobby.Data.ContainsKey(MAP_KEY)) return 0;
-        return int.Parse(_currentLobby.Data[MAP_KEY].Value);
+        if (currentLobby?.Data == null) return 0;
+        if (!currentLobby.Data.ContainsKey(MAP_KEY)) return 0;
+        return int.Parse(currentLobby.Data[MAP_KEY].Value);
     }
 
-    // -------------------------------------------------------
-    // -- HEARTBEAT ------------------------------------------
-    // -------------------------------------------------------
+    // -- Others --
 
     private IEnumerator HeartbeatCoroutine()
     {
         while (true)
         {
             yield return new WaitForSeconds(15f);
-            if (_currentLobby != null)
-                LobbyService.Instance.SendHeartbeatPingAsync(_currentLobby.Id);
+            if (currentLobby != null) LobbyService.Instance.SendHeartbeatPingAsync(currentLobby.Id);
         }
     }
-
-    // -------------------------------------------------------
-    // -- Relay Helpers --------------------------------------
-    // -------------------------------------------------------
-
-    // private RelayServerData GetHostRelayData(Allocation allocation, string connectionType)
-    // {
-    //     return new RelayServerData(
-    //         allocation.RelayServer.IpV4,
-    //         (ushort)allocation.RelayServer.Port,
-    //         allocation.AllocationIdBytes,
-    //         allocation.ConnectionData,
-    //         allocation.ConnectionData,
-    //         allocation.Key,
-    //         connectionType == "dtls" || connectionType == "wss"  // isSecure
-    //     );
-    // }
-
-    // private RelayServerData GetClientRelayData(JoinAllocation joinAllocation, string connectionType)
-    // {
-    //     return new RelayServerData(
-    //         joinAllocation.RelayServer.IpV4,
-    //         (ushort)joinAllocation.RelayServer.Port,
-    //         joinAllocation.AllocationIdBytes,
-    //         joinAllocation.ConnectionData,
-    //         joinAllocation.HostConnectionData,
-    //         joinAllocation.Key,
-    //         connectionType == "dtls" || connectionType == "wss"  // isSecure
-    //     );
-    // }
-
-    // -------------------------------------------------------
-    // -- Player Data ----------------------------------------
-    // -------------------------------------------------------
 
     private Dictionary<string, PlayerDataObject> GetLocalPlayerData()
     {
         return new Dictionary<string, PlayerDataObject>
         {
-            { "PlayerName", new PlayerDataObject(
-                PlayerDataObject.VisibilityOptions.Member,
+            { "PlayerName", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member,
                 PlayerPrefs.GetString("PlayerName", "Player")) },
-            { "Wins", new PlayerDataObject(
-                PlayerDataObject.VisibilityOptions.Member,
+            { "Wins", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member,
                 RecordManager.Instance?.Wins.ToString() ?? "0") },
-            { "Losses", new PlayerDataObject(
-                PlayerDataObject.VisibilityOptions.Member,
+            { "Losses", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member,
                 RecordManager.Instance?.Losses.ToString() ?? "0") },
-            { "Draws", new PlayerDataObject(
-                PlayerDataObject.VisibilityOptions.Member,
+            { "Draws", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member,
                 RecordManager.Instance?.Draws.ToString() ?? "0") },
         };
     }
@@ -593,17 +476,17 @@ public class MatchManager : MonoBehaviour
     {
         var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
         bool useWebSocket = Application.platform == RuntimePlatform.WebGLPlayer;
-        Debug.Log($"SetupTransport. platform:{Application.platform} useWebSocket:{useWebSocket}");
         transport.UseWebSockets = useWebSocket;
     }
 
     private Unity.Services.Multiplayer.RelayProtocol GetConnectionType()
     {
+        // Select connection type at runtime
         Unity.Services.Multiplayer.RelayProtocol type;
         if (Application.isEditor) type = Unity.Services.Multiplayer.RelayProtocol.UDP;
         else if (Application.platform == RuntimePlatform.WebGLPlayer) type = Unity.Services.Multiplayer.RelayProtocol.WSS;
         else type = Unity.Services.Multiplayer.RelayProtocol.DTLS;
-        Debug.Log($"GetConnectionType: {type} platform:{Application.platform}");
+
         return type;
     }
 }

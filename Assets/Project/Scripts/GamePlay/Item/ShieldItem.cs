@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Shield: reflects the next incoming projectile once, then consumed.
+// Reflects next attack
 public class ShieldItem : ItemBase
 {
     public override void Apply(GameObject tank)

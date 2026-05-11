@@ -3,24 +3,19 @@ using System.Collections;
 
 namespace BrmnModules.UI
 {
-    // Popup UI with fade animation and backdrop.
-    // Managed as a stack by UIManager.
+    // Popup UI with fade and backdrop
     public abstract class PopupUI : BaseUI
     {
         [Header("Popup Settings")]
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private float fadeDuration = 0.5f;
 
-        private Coroutine _fadeCoroutine;
+        private Coroutine fadeCoroutine;
 
         public override void Initialize()
         {
-            // -- Start hidden --
-            if (canvasGroup == null)
-                canvasGroup = GetComponent<CanvasGroup>();
-
-            if (canvasGroup != null)
-                canvasGroup.alpha = 0f;
+            if (canvasGroup == null) canvasGroup = GetComponent<CanvasGroup>();
+            if (canvasGroup != null) canvasGroup.alpha = 0f;
 
             gameObject.SetActive(false);
         }
@@ -29,10 +24,8 @@ namespace BrmnModules.UI
         {
             gameObject.SetActive(true);
 
-            if (_fadeCoroutine != null)
-                StopCoroutine(_fadeCoroutine);
-
-            _fadeCoroutine = StartCoroutine(FadeCoroutine(0f, 1f));
+            if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
+            fadeCoroutine = StartCoroutine(FadeCoroutine(0f, 1f));
         }
 
         public virtual void Hide()
@@ -43,17 +36,15 @@ namespace BrmnModules.UI
                 return;
             }
 
-            if (_fadeCoroutine != null)
-                StopCoroutine(_fadeCoroutine);
+            if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
 
-            _fadeCoroutine = StartCoroutine(FadeCoroutine(1f, 0f, onComplete: () =>
+            fadeCoroutine = StartCoroutine(FadeCoroutine(1f, 0f, onComplete: () =>
             {
                 gameObject.SetActive(false);
             }));
         }
 
-        private IEnumerator FadeCoroutine(float from, float to,
-            System.Action onComplete = null)
+        private IEnumerator FadeCoroutine(float from, float to, System.Action onComplete = null)
         {
             if (canvasGroup == null) yield break;
 

@@ -14,31 +14,24 @@ public class PlayerNamePopup : PopupUI
     {
         base.Initialize();
 
-        // -- Load saved name if exists --
-        if (nameInput != null)
-            nameInput.text = PlayerPrefs.GetString("PlayerName", "");
+        if (nameInput != null) nameInput.text = PlayerPrefs.GetString("PlayerName", "");
 
         okButton?.onClick.AddListener(OnConfirmButton);
     }
 
-    // -- Confirm button --
     public void OnConfirmButton()
     {
         string name = nameInput?.text.Trim();
 
-        // -- Validation --
         if (string.IsNullOrEmpty(name) || name.Length < MIN_LENGTH)
         {
-            UIManager.Instance.ShowPopup<ErrorMessagePopup>(popup =>
-                popup.ShowMessage($"Name must be at least {MIN_LENGTH} characters."));
+            UIManager.Instance.ShowPopup<ErrorMessagePopup>(popup => popup.ShowMessage($"Name must be at least {MIN_LENGTH} characters."));
             return;
         }
 
-        // -- Save name --
         PlayerPrefs.SetString("PlayerName", name);
         PlayerPrefs.Save();
 
-        // -- Proceed to multiplayer panel --
         UIManager.Instance?.HidePopup(this);
         UIManager.Instance?.ShowPopup<MultiplayPopup>();
     }

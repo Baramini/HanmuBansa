@@ -1,5 +1,5 @@
+// external code
 using UnityEngine;
-using System.Collections;
 
 namespace Benjathemaker
 {

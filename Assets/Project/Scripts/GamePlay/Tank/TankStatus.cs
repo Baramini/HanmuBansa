@@ -1,59 +1,58 @@
 using UnityEngine;
 using Unity.Netcode;
 
-// Manages all item-related status effects on the tank.
-// Pre-attached to tank prefab — no dynamic AddComponent needed.
 public class TankStatus : NetworkBehaviour
 {
-    // -- Shield --
+    // Shield
     public bool HasShield { get; private set; }
 
-    // -- Booster --
+    // Booster
     public float SpeedMultiplier { get; private set; } = 1f;
-    private float _boostTimer;
+    private float boostTimer;
 
-    // -- Events for visual updates --
+    // Visual event
     public event System.Action<bool> OnShieldChanged;
     public event System.Action<float> OnSpeedChanged;
 
     private void Update()
     {
+        // Only owner
         if (!IsOwner) return;
 
-        if (_boostTimer > 0f)
+        if (boostTimer > 0f)
         {
-            _boostTimer -= Time.deltaTime;
-            if (_boostTimer <= 0f)
-                SpeedMultiplier = 1f;
+            boostTimer -= Time.deltaTime;
+            if (boostTimer <= 0f) SpeedMultiplier = 1f;
         }
     }
 
-    // -- Called by server when item is picked up --
     public void ActivateShield()
     {
+        // Only server process
         if (!IsServer) return;
         SyncShieldClientRpc(true);
     }
 
     public void ConsumeShield()
     {
+        // Only server process
         if (!IsServer) return;
         SyncShieldClientRpc(false);
     }
 
     public void ActivateBooster(float multiplier, float duration)
     {
+        // Only server process
         if (!IsServer) return;
         SyncBoosterClientRpc(multiplier, duration);
     }
 
     public void ResetHeat()
     {
+        // Only server process
         if (!IsServer) return;
 
-        // -- Coolant: call TankShooter directly on server --
         GetComponent<TankShooter>()?.ResetHeat();
-        // -- Sync to owner client --
         ResetHeatClientRpc();
     }
 
@@ -62,16 +61,16 @@ public class TankStatus : NetworkBehaviour
     {
         HasShield = active;
         OnShieldChanged?.Invoke(active);
-        // -- TODO: shield visual --
+        // TODO: shield visual
     }
 
     [ClientRpc]
     private void SyncBoosterClientRpc(float multiplier, float duration)
     {
         SpeedMultiplier = multiplier;
-        _boostTimer = duration;
+        boostTimer = duration;
         OnSpeedChanged?.Invoke(multiplier);
-        // -- TODO: booster visual --
+        // TODO: booster visual
     }
 
     [ClientRpc]
