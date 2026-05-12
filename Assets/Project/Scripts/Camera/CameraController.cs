@@ -9,7 +9,7 @@ public class CameraController : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         // Only local owner
-        if (!IsOwner) return;
+        if (!IsOwner || !NetworkObject.IsPlayerObject) return;
 
         if (cinemachineCamera == null) cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
         if (cinemachineCamera != null) cinemachineCamera.Follow = transform;

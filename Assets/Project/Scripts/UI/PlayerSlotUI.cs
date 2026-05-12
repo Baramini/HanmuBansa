@@ -29,5 +29,11 @@ public class PlayerSlotUI : MonoBehaviour
     public void SetEmpty()
     {
         if (emptyState != null) emptyState.SetActive(true);
+
+        if (nameText != null) nameText.text = "";
+        if (recordText != null) recordText.text = "";
+        if (hostBadge != null) hostBadge.SetActive(false);
+        
+        SetTank(null);
     }
 }

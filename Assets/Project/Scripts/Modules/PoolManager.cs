@@ -22,7 +22,6 @@ namespace BrmnModules.Pool
             DontDestroyOnLoad(gameObject);
         }
 
-        // Pool does not exist, create first
         public GameObject Get(GameObject prefab, Vector3 position, Quaternion rotation, Transform parent = null)
         {
             if (!pools.ContainsKey(prefab)) CreatePool(prefab, parent);
@@ -35,7 +34,6 @@ namespace BrmnModules.Pool
             return obj;
         }
 
-        // Return object to pool
         public void Release(GameObject prefab, GameObject obj)
         {
             if (!pools.ContainsKey(prefab))
@@ -45,10 +43,18 @@ namespace BrmnModules.Pool
             }
 
             if (poolParents.TryGetValue(prefab, out Transform parent) && parent != null) obj.transform.SetParent(parent);
+
             pools[prefab].Release(obj);
         }
 
-        // Create new pool
+        public void ClearAllPools()
+        {
+            foreach (var pool in pools.Values) pool.Clear();
+
+            pools.Clear();
+            poolParents.Clear();
+        }
+
         private void CreatePool(GameObject prefab, Transform parent)
         {
             if (parent != null) poolParents[prefab] = parent;
@@ -59,7 +65,7 @@ namespace BrmnModules.Pool
                 actionOnRelease: obj => obj.SetActive(false),
                 actionOnDestroy: obj => Destroy(obj),
                 defaultCapacity: 50,
-                maxSize: 1000
+                maxSize: 1000 // Free UGS issue...
             );
         }
     }

@@ -6,12 +6,12 @@ using System.Collections.Generic;
 public class SpawnManager : NetworkBehaviour
 {
     [SerializeField] private List<Transform> spawnPoints;
+    [SerializeField] private List<GameObject> aiTankPrefabs;
 
     private List<ulong> connectedClients = new();
 
     public override void OnNetworkSpawn()
     {
-        // Only server process
         if (!IsServer) return;
 
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
@@ -20,7 +20,6 @@ public class SpawnManager : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
-        // Only server process
         if (!IsServer) return;
 
         NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
@@ -29,7 +28,6 @@ public class SpawnManager : NetworkBehaviour
 
     private void OnClientConnected(ulong clientId)
     {
-        // Only server process
         if (!IsServer) return;
 
         if (!connectedClients.Contains(clientId)) connectedClients.Add(clientId);
@@ -37,7 +35,6 @@ public class SpawnManager : NetworkBehaviour
 
     private void OnClientDisconnected(ulong clientId)
     {
-        // Only server process
         if (!IsServer) return;
 
         connectedClients.Remove(clientId);
@@ -63,6 +60,11 @@ public class SpawnManager : NetworkBehaviour
 
             spawnIndex++;
         }
+
+        if (GameMode.IsSingleplay)
+        {
+            SpawnAITanks(ref spawnIndex);
+        }
     }
 
     private string GetPlayerName(ulong clientId)
@@ -75,5 +77,30 @@ public class SpawnManager : NetworkBehaviour
             if (player.Data != null && player.Data.ContainsKey("PlayerName")) return player.Data["PlayerName"].Value;
         }
         return $"Player {clientId}";
+    }
+
+    private void SpawnAITanks(ref int spawnIndex)
+    {
+        int aiCount = SingleplaySettings.AICount;
+
+        for (int i = 0; i < aiCount; i++)
+        {
+            if (aiTankPrefabs == null || aiTankPrefabs.Count == 0) break;
+
+            Vector3 pos = spawnIndex < spawnPoints.Count
+                ? spawnPoints[spawnIndex].position
+                : Vector3.zero;
+
+            int prefabIndex = Random.Range(0, aiTankPrefabs.Count);
+            GameObject aiTank = Instantiate(aiTankPrefabs[prefabIndex], pos, Quaternion.identity);
+
+            NetworkObject netObj = aiTank.GetComponent<NetworkObject>();
+            netObj.Spawn();
+
+            string aiName = $"AI_{i + 1}";
+            GameManager.Instance?.SetPlayer(aiTank.GetComponent<TankHealth>(), ulong.MaxValue - (ulong)i, aiName);
+
+            spawnIndex++;
+        }
     }
 }

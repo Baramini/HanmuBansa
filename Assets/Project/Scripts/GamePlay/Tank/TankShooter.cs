@@ -42,6 +42,7 @@ public class TankShooter : NetworkBehaviour
     // Local cache for owner input handling
     private float localHeat;
     private bool localIsOverheated;
+    private bool isLocalPlayer = false;
 
     public float ChargeRatio => chargeTime / maxChargeTime;
     public float HeatRatio => localHeat / maxHeat;
@@ -51,6 +52,7 @@ public class TankShooter : NetworkBehaviour
     private const float HEAT_SYNC_THRESHOLD = 1f;
 
     private float chargeTime;
+    public bool Overheat => overheatTimer > 0f;
     private float overheatTimer;
     private float fireCoolTimer;
     private bool isCharging;
@@ -59,7 +61,8 @@ public class TankShooter : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         // Only owner
-        if (!IsOwner) return;
+        isLocalPlayer = IsOwner && NetworkObject.IsPlayerObject;
+        if (!isLocalPlayer) return;
 
         inputActions = new PlayerInputActions();
         mainCamera = Camera.main;
@@ -75,13 +78,16 @@ public class TankShooter : NetworkBehaviour
     public override void OnNetworkDespawn()
     {
         // Only owner
-        if (!IsOwner) return;
+        if (!isLocalPlayer) return;
 
         networkIsOverheated.OnValueChanged -= OnOverheatedChanged;
 
         inputActions.Player.Fire.started -= OnFireStarted;
         inputActions.Player.Fire.canceled -= OnFireCanceled;
         inputActions.Player.Fire.Disable();
+        inputActions.Dispose();
+
+        isLocalPlayer = false;
     }
 
     // Notify aLL clients overheat
@@ -92,7 +98,7 @@ public class TankShooter : NetworkBehaviour
 
     private void Update()
     {
-        if (!IsOwner) return;
+        if (!isLocalPlayer) return;
         if (GameManager.Instance == null || !GameManager.Instance.IsGameStarted) return;
 
         HandleAim();
@@ -163,6 +169,7 @@ public class TankShooter : NetworkBehaviour
     private void OnFireCanceled(InputAction.CallbackContext inputCallback)
     {
         if (!isCharging) return;
+        if (firePoint == null || !firePoint.gameObject.activeInHierarchy) return;
 
         float ratio = chargeTime / maxChargeTime;
         float speed = Mathf.Lerp(minSpeed, maxSpeed, ratio);
@@ -220,5 +227,24 @@ public class TankShooter : NetworkBehaviour
         localHeat = 0f;
         localIsOverheated = false;
         overheatTimer = 0f;
+    }
+
+    // -- Enemy AI related logic --
+    public void AIFire()
+    {
+       if (!IsServer) return;
+       if (localIsOverheated || fireCoolTimer > 0f) return;
+
+       GameObject obj = PoolManager.Instance.Get(
+           projectilePrefab,
+           firePoint.position,
+           firePoint.rotation,
+           null
+       );
+       obj.GetComponent<NetworkObject>().Spawn();
+       obj.GetComponent<Projectile>().InitOnServer(projectilePrefab, firePoint.forward * maxSpeed);
+
+       AddHeatLocally(1f);
+       fireCoolTimer = fireCoolTime;
     }
 }

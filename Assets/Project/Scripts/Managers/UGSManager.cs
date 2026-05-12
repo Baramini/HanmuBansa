@@ -25,14 +25,21 @@ public class UGSManager : MonoBehaviour
 
     private async Task InitializeAsync()
     {
-        await UnityServices.InitializeAsync();
-
-        if (!AuthenticationService.Instance.IsSignedIn) await AuthenticationService.Instance.SignInAnonymouslyAsync();
-
-        // Set player name after sign in
-        string playerName = PlayerPrefs.GetString("PlayerName", "Player");
-        await AuthenticationService.Instance.UpdatePlayerNameAsync(playerName);
-
-        IsInitialized = true;
+        try
+        {
+            await UnityServices.InitializeAsync();
+ 
+            if (!AuthenticationService.Instance.IsSignedIn) await AuthenticationService.Instance.SignInAnonymouslyAsync();
+ 
+            string playerName = PlayerPrefs.GetString("PlayerName", "Player");
+            await AuthenticationService.Instance.UpdatePlayerNameAsync(playerName);
+ 
+            IsInitialized = true;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"UGS initialization failed: {e.Message}");
+            IsInitialized = true;
+        }
     }
 }

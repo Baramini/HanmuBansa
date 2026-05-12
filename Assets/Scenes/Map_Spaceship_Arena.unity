@@ -1049,6 +1049,8 @@ MonoBehaviour:
   - {fileID: 1407975744}
   - {fileID: 46037588}
   - {fileID: 888276741}
+  aiTankPrefabs:
+  - {fileID: 191448, guid: 0bc8ce35373facc43929430aa0bbb230, type: 3}
 --- !u!114 &560861441
 MonoBehaviour:
   m_ObjectHideFlags: 0

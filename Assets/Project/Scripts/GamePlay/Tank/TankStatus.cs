@@ -17,7 +17,7 @@ public class TankStatus : NetworkBehaviour
     private void Update()
     {
         // Only owner
-        if (!IsOwner) return;
+        if (!IsOwner || !NetworkObject.IsPlayerObject) return;
 
         if (boostTimer > 0f)
         {
@@ -28,28 +28,27 @@ public class TankStatus : NetworkBehaviour
 
     public void ActivateShield()
     {
-        // Only server process
         if (!IsServer) return;
+
         SyncShieldClientRpc(true);
     }
 
     public void ConsumeShield()
     {
-        // Only server process
         if (!IsServer) return;
+
         SyncShieldClientRpc(false);
     }
 
     public void ActivateBooster(float multiplier, float duration)
     {
-        // Only server process
         if (!IsServer) return;
+        
         SyncBoosterClientRpc(multiplier, duration);
     }
 
     public void ResetHeat()
     {
-        // Only server process
         if (!IsServer) return;
 
         GetComponent<TankShooter>()?.ResetHeat();

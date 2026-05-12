@@ -39,6 +39,8 @@ public class ItemSpawner : NetworkBehaviour
     {
         if (!IsServer) return;
 
+        StopAllCoroutines();
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnSpecialItemSpawn -= OnSpecialItemSpawn;
@@ -49,12 +51,10 @@ public class ItemSpawner : NetworkBehaviour
     private IEnumerator NormalItemSpawnCoroutine()
     {
         // Wait until NetworkManager listen
-        yield return new WaitUntil(() => 
-            NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening);
+        yield return new WaitUntil(() => NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening);
 
         // Wait until game start
-        yield return new WaitUntil(() =>
-            GameManager.Instance != null && GameManager.Instance.IsGameStarted);
+        yield return new WaitUntil(() => GameManager.Instance != null && GameManager.Instance.IsGameStarted);
 
         yield return new WaitForSeconds(spawnInterval);
 

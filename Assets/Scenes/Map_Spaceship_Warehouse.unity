@@ -4208,6 +4208,8 @@ MonoBehaviour:
   - {fileID: 916164021}
   - {fileID: 39202065}
   - {fileID: 157416105}
+  aiTankPrefabs:
+  - {fileID: 191448, guid: 0bc8ce35373facc43929430aa0bbb230, type: 3}
 --- !u!1 &2067591282
 GameObject:
   m_ObjectHideFlags: 0

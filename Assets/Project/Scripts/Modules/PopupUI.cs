@@ -28,10 +28,17 @@ namespace BrmnModules.UI
             fadeCoroutine = StartCoroutine(FadeCoroutine(0f, 1f));
         }
 
-        public virtual void Hide()
+        public virtual void Hide(bool fade = true)
         {
             if (!gameObject.activeInHierarchy)
             {
+                gameObject.SetActive(false);
+                return;
+            }
+
+            if (!fade)
+            {
+                canvasGroup.alpha = 0f;
                 gameObject.SetActive(false);
                 return;
             }

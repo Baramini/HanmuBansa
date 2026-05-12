@@ -17,7 +17,7 @@ public class LobbyPopup : PopupUI
     [Header("Player Log")]
     [SerializeField] private LobbyLog lobbyLog;
 
-    [Header("Bottom Buttons")]
+    [Header("Buttons")]
     [SerializeField] private Button startButton;
     [SerializeField] private TextMeshProUGUI startButtonText;
     [SerializeField] private Button leaveButton;
@@ -46,6 +46,29 @@ public class LobbyPopup : PopupUI
 
     public override void Show()
     {
+        var tankSelectPanel = UIManager.Instance?.GetPopup<TankSelectPopup>();
+        if (tankSelectPanel != null)
+        {
+            tankSelectPanel.OnTankSelected -= OnTankSelectConfirmed;
+            tankSelectPanel.OnTankSelected += OnTankSelectConfirmed;
+        }
+
+        if (TankSelectManager.Instance != null)
+        {
+            TankSelectManager.Instance.OnSelectionChanged -= OnSelectionChanged;
+            TankSelectManager.Instance.OnSelectionChanged += OnSelectionChanged;
+        }
+
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnPlayerJoined;
+            NetworkManager.Singleton.OnClientConnectedCallback += OnPlayerJoined;
+            NetworkManager.Singleton.OnClientDisconnectCallback -= OnPlayerLeft;
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnPlayerLeft;
+        }
+
+        lobbyPollTimer = 0f;
+
         base.Show();
         RefreshAll();
     }
@@ -160,8 +183,7 @@ public class LobbyPopup : PopupUI
     private string GetPlayerName(ulong clientId)
     {
         // Use clientId fallback 
-        return clientId == NetworkManager.Singleton.LocalClientId
-            ? PlayerPrefs.GetString("PlayerName", "Me") : $"Player {clientId}";
+        return clientId == NetworkManager.Singleton.LocalClientId ? PlayerPrefs.GetString("PlayerName", "Me") : $"Player {clientId}";
     }
 
     public void RefreshPlayerSlots()
@@ -307,7 +329,7 @@ public class LobbyPopup : PopupUI
         OnLeaveButton();
     }
 
-    public override void Hide()
+    public override void Hide(bool fade)
     {
         var tankSelectPanel = UIManager.Instance?.GetPopup<TankSelectPopup>();
         if (tankSelectPanel != null) tankSelectPanel.OnTankSelected -= OnTankSelectConfirmed;
@@ -322,7 +344,7 @@ public class LobbyPopup : PopupUI
 
         lobbyPollTimer = float.MaxValue;
         lobbyLog?.Clear();
-        base.Hide();
+        base.Hide(false);
     }
 
     private string GetPlayerData(Unity.Services.Lobbies.Models.Lobby lobby,

@@ -24,7 +24,7 @@ public class GameManager : NetworkBehaviour
     public event System.Action<float> OnTimerChanged;
     public event System.Action<int> OnAliveCountChanged;
     public event System.Action OnSpecialItemSpawn;
-    public event System.Action<string> OnGameEnd;
+    //public event System.Action<string> OnGameEnd;
 
     private Dictionary<ulong, string> playerNames = new();
     private List<TankHealth> tanks = new();
@@ -34,7 +34,8 @@ public class GameManager : NetworkBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) {
+        if (Instance != null && Instance != this)
+        {
             Destroy(gameObject);
             return;
         }
@@ -70,7 +71,6 @@ public class GameManager : NetworkBehaviour
 
     public void SetPlayer(TankHealth tank, ulong clientId, string playerName)
     {
-        // Only server process
         if (!IsServer) return;
 
         tanks.Add(tank);
@@ -130,7 +130,6 @@ public class GameManager : NetworkBehaviour
 
     private void OnTankDead(TankHealth deadTank)
     {
-        // Only server process
         if (!IsServer) return;
 
         networkAliveCount.Value--;
@@ -146,8 +145,7 @@ public class GameManager : NetworkBehaviour
             if (winnerTank != null)
             {
                 NetworkObject winnerNetObj = winnerTank.GetComponent<NetworkObject>();
-                if (playerNames.TryGetValue(winnerNetObj.OwnerClientId, out string name))
-                    winnerName = name;
+                if (playerNames.TryGetValue(winnerNetObj.OwnerClientId, out string name)) winnerName = name;
             }
 
             EndGame(winnerName, false);
@@ -170,11 +168,21 @@ public class GameManager : NetworkBehaviour
     public void ResetGame()
     {
         if (!IsServer) return;
+    
+        foreach (TankHealth tank in tanks)
+        {
+            if (tank == null) continue;
+    
+            NetworkObject netObj = tank.GetComponent<NetworkObject>();
+            if (netObj != null && netObj.IsSpawned) netObj.Despawn(true);
+        }
+    
+        tanks.Clear();
+        playerNames.Clear();
+    
         networkGameStarted.Value = false;
         networkTimer.Value = 0f;
         gameEnded = false;
-        tanks.Clear();
-        playerNames.Clear();
     }
 
     [ClientRpc]
@@ -182,10 +190,10 @@ public class GameManager : NetworkBehaviour
     {
         if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject netObj)) return;
 
-        bool isMyTank = netObj.IsOwner;
+        bool isMyTank = netObj.IsOwner && netObj.IsPlayerObject;
         netObj.gameObject.SetActive(false);
 
-        if (isMyTank) UIManager.Instance?.ShowPopup<GameOverPopup>(p => p.Setup(false));
+        if (isMyTank) UIManager.Instance?.ShowPopup<GameOverPopup>(p => p.Setup());
     }
 
     [ClientRpc]
@@ -193,17 +201,29 @@ public class GameManager : NetworkBehaviour
     {
         gameEnded = true;
         Time.timeScale = 0f;
-
-        // Save record
+        
         string localName = PlayerPrefs.GetString("PlayerName", "");
         bool isWinner = !isDraw && winnerName == localName;
 
-        if (isDraw) RecordManager.Instance?.RecordDraw();
-        else if (isWinner) RecordManager.Instance?.RecordWin();
-        else RecordManager.Instance?.RecordLoss();
-
-        bool hasGameOver = UIManager.Instance?.IsPopupOpen<GameOverPopup>() ?? false;
-        if (!hasGameOver) UIManager.Instance?.ShowPopup<ResultPopup>(p => p.SetResult(isDraw ? "Draw" : winnerName));
+        if (GameMode.IsSingleplay)
+        {
+            bool hasGameOver = UIManager.Instance?.IsPopupOpen<GameOverPopup>() ?? false;
+            if (!hasGameOver)
+            {
+                string resultLabel = isDraw ? "Draw" : "Last standing!";
+                UIManager.Instance?.ShowPopup<ResultPopup>(p => p.SetResult(resultLabel));
+            }
+        }
+        else
+        {
+            // Save record only multi
+            if (isDraw) RecordManager.Instance?.RecordDraw();
+            else if (isWinner) RecordManager.Instance?.RecordWin();
+            else RecordManager.Instance?.RecordLoss();
+    
+            bool hasGameOver = UIManager.Instance?.IsPopupOpen<GameOverPopup>() ?? false;
+            if (!hasGameOver) UIManager.Instance?.ShowPopup<ResultPopup>(p => p.SetResult(isDraw ? "Draw" : winnerName));
+        }
     }
 
     [ClientRpc]

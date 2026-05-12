@@ -16,11 +16,11 @@ public class LoadingPopup : PopupUI
         dotCoroutine = StartCoroutine(AnimateDotsCoroutine());
     }
 
-    public override void Hide()
+    public override void Hide(bool fade)
     {
         if (dotCoroutine != null) StopCoroutine(dotCoroutine);
 
-        base.Hide();
+        base.Hide(false);
     }
 
     private IEnumerator AnimateDotsCoroutine()

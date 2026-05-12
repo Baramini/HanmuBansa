@@ -131,6 +131,18 @@ namespace BrmnModules.UI
             while (temp.Count > 0) popupStack.Push(temp.Pop());
         }
 
+        public void ResetPopupState()
+        {
+            foreach (var popup in popupCache.Values)
+            {
+                if (popup != null && popup.gameObject.activeSelf) popup.Hide(false);
+            }
+ 
+            popupStack.Clear();
+ 
+            if (backdrop != null) backdrop.SetActive(false);
+        }
+
         // -- Persistent API --
         public T GetPersistent<T>() where T : PersistentUI
         {

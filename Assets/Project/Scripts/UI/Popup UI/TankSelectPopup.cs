@@ -26,6 +26,12 @@ public class TankSelectPopup : PopupUI
 
     public override void Show()
     {
+        if (TankSelectManager.Instance != null)
+        {
+            TankSelectManager.Instance.OnSelectionChanged -= RefreshSlots;
+            TankSelectManager.Instance.OnSelectionChanged += RefreshSlots;
+        }
+
         base.Show();
         RefreshSlots();
     }
@@ -58,10 +64,10 @@ public class TankSelectPopup : PopupUI
         base.OnCloseButton();
     }
 
-    public override void Hide()
+    public override void Hide(bool fade)
     {
         if (TankSelectManager.Instance != null) TankSelectManager.Instance.OnSelectionChanged -= RefreshSlots;
 
-        base.Hide();
+        base.Hide(false);
     }
 }

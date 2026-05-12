@@ -9,6 +9,7 @@ public class TankSelectManager : NetworkBehaviour
 
     // -1 => not selected
     private Dictionary<ulong, int> selections = new();
+    public Dictionary<ulong, int> Selections => selections;
 
     // Notify UI to refresh
     public event System.Action OnSelectionChanged;
@@ -20,8 +21,9 @@ public class TankSelectManager : NetworkBehaviour
             return;
         }
         Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
-
+    
     // When player select tank
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void SelectTankServerRpc(int tankIndex, RpcParams rpcParams = default)
@@ -87,13 +89,13 @@ public class TankSelectManager : NetworkBehaviour
         return selections.TryGetValue(localId, out int index) ? index : -1;
     }
 
-    // Get tank prefab
     public GameObject GetTankPrefab(ulong clientId)
     {
         if (selections.TryGetValue(clientId, out int index)) return tankPrefabs[index];
 
-        // Not select first tank callback
-        return tankPrefabs[0];
+        // Not selected random tank callback
+        int randIndex = Random.Range(0, tankPrefabs.Count - 1);
+        return tankPrefabs[randIndex];
     }
 
     // Check if all connected clients have selected

@@ -58,10 +58,14 @@
     <Compile Include="Assets\Project\Scripts\GamePlay\Item\CoolantItem.cs" />
     <Compile Include="Assets\Project\Scripts\Camera\CameraController.cs" />
     <Compile Include="Assets\Project\Scripts\UI\Popup UI\LobbyPopup.cs" />
+    <Compile Include="Assets\Project\Scripts\Modules\BehaviorTree.cs" />
     <Compile Include="Assets\Project\Scripts\UI\Popup UI\ErrorMessagePopup.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Item\SimpleGemsAnim.cs" />
+    <Compile Include="Assets\Project\Scripts\Common\GameMode.cs" />
+    <Compile Include="Assets\Project\Scripts\Modules\ScreenDebugger.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Item\ItemBase.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Tank\TankStatus.cs" />
+    <Compile Include="Assets\Project\Scripts\GamePlay\Tank\AITankBrain.cs" />
     <Compile Include="Assets\Project\Scripts\UI\Popup UI\TankSelectPopup.cs" />
     <Compile Include="Assets\Project\Scripts\Managers\UGSManager.cs" />
     <Compile Include="Assets\Project\Scripts\Modules\SceneInitializer.cs" />
@@ -105,6 +109,7 @@
     <Compile Include="Assets\Project\Scripts\UI\LobbyLog.cs" />
     <Compile Include="Assets\Project\Scripts\Managers\TankSelectManager.cs" />
     <Compile Include="Assets\Project\Scripts\Modules\KeyboardMovementInput.cs" />
+    <Compile Include="Assets\Project\Scripts\GamePlay\Tank\AITankController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

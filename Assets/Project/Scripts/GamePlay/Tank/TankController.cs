@@ -13,6 +13,8 @@ public class TankController : NetworkBehaviour
     private PlayerInputActions inputActions;
     private Vector2 moveInput;
 
+    private bool isLocalPlayer = false;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -22,7 +24,8 @@ public class TankController : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         // Only owner
-        if (!IsOwner) return;
+        isLocalPlayer = IsOwner && NetworkObject.IsPlayerObject;
+        if (!isLocalPlayer) return;
 
         inputActions.Player.Move.Enable();
         inputActions.Player.Move.performed += OnMove;
@@ -32,11 +35,14 @@ public class TankController : NetworkBehaviour
     public override void OnNetworkDespawn()
     {
         // Only owner
-        if (!IsOwner) return;
+        if (!isLocalPlayer) return;
 
         inputActions.Player.Move.performed -= OnMove;
         inputActions.Player.Move.canceled -= OnMove;
         inputActions.Player.Move.Disable();
+        inputActions.Dispose();
+
+        isLocalPlayer = false;
     }
 
     private void OnMove(InputAction.CallbackContext inputCallback)
@@ -47,7 +53,7 @@ public class TankController : NetworkBehaviour
     private void FixedUpdate()
     {
         // Only owner
-        if (!IsOwner) return;
+        if (!isLocalPlayer) return;
 
         if (UIManager.Instance?.IsAnyPopupOpen ?? false) return;
         if (GameManager.Instance == null || !GameManager.Instance.IsGameStarted) return;
@@ -57,7 +63,7 @@ public class TankController : NetworkBehaviour
 
     private void HandleMovement()
     {
-        float speedMult = GetComponent<TankStatus>()?.SpeedMultiplier ?? 1f; // boost item
+        float speedMult = GetComponent<TankStatus>()?.SpeedMultiplier ?? 1f;
         float currentSpeed = moveSpeed * speedMult;
 
         Vector3 moveDir = transform.forward * moveInput.y;

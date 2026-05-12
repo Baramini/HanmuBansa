@@ -5,17 +5,24 @@ using Unity.Netcode;
 using Unity.Cinemachine;
 using System.Collections.Generic;
 using BrmnModules.UI;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class GameOverPopup : PopupUI
 {
     [SerializeField] private TextMeshProUGUI messageText;
+
+    [Header("Multiplay")]
     [SerializeField] private Button spectateButton;
     [SerializeField] private Button nextPlayerButton;
+    [SerializeField] private GameObject multiplayUI;
+
+    [Header("Singleplay")]
+    [SerializeField] private GameObject singleplayUI;
 
     private CinemachineCamera cinemachineCamera;
     private List<GameObject> aliveTanks = new();
     private int spectateIndex = 0;
-    private bool isSpectating = false;
 
     public override void Initialize()
     {
@@ -23,29 +30,42 @@ public class GameOverPopup : PopupUI
         cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
     }
 
-    public void Setup(bool isWinner)
+    public void Setup()
     {
         if (messageText != null) messageText.text = "You are dead";
 
-        RefreshAliveTanks();
+        bool isSingle = GameMode.IsSingleplay;
 
-        // Show spectate button only game not end
-        if (spectateButton != null) spectateButton.gameObject.SetActive(aliveTanks.Count > 0);
-
+        // Only multi can spectate
+        if (spectateButton != null)
+        {
+            if (isSingle)
+            {
+                spectateButton.gameObject.SetActive(false);
+            }
+            else
+            {
+                RefreshAliveTanks();
+                spectateButton.gameObject.SetActive(aliveTanks.Count > 1);
+            }
+        }
         if (nextPlayerButton != null) nextPlayerButton.gameObject.SetActive(false);
+
+        multiplayUI?.SetActive(!isSingle);
+        singleplayUI?.SetActive(isSingle);
     }
 
+    // -- Multi play --
     public void OnSpectateButton()
     {
         if (aliveTanks.Count == 0) return;
 
-        isSpectating = true;
         spectateIndex = 0;
-
         SetCameraTarget(aliveTanks[spectateIndex]);
+
+        if (nextPlayerButton != null) nextPlayerButton.gameObject.SetActive(aliveTanks.Count > 1);
     }
 
-    // Next player button
     public void OnNextPlayerButton()
     {
         RefreshAliveTanks();
@@ -58,19 +78,40 @@ public class GameOverPopup : PopupUI
     public void OnLeaveButton()
     {
         UIManager.Instance?.ShowPopup<LoadingPopup>();
-
         _ = LeaveAndLoadMainMenuAsync();
     }
 
     private async System.Threading.Tasks.Task LeaveAndLoadMainMenuAsync()
     {
         await System.Threading.Tasks.Task.Delay(1000);
-
         await MatchManager.Instance?.LeaveRoomAsync();
-
-        UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+        SceneManager.LoadScene(0);
     }
 
+    // -- Single play --
+    public void OnMainMenuButton()
+    {
+        Time.timeScale = 1f;
+        UIManager.Instance?.ShowPopup<LoadingPopup>();
+        UIManager.Instance?.StartCoroutine(MainMenuCoroutine());
+    }
+
+    private IEnumerator MainMenuCoroutine()
+    {
+        _ = MatchManager.Instance?.LeaveRoomAsync();
+
+        float elapsed = 0f;
+        while (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening && elapsed < 5f)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        yield return new WaitForSecondsRealtime(0.2f);
+        SceneManager.LoadScene(0);
+    }
+
+    // -- others --
     private void SetCameraTarget(GameObject tank)
     {
         if (cinemachineCamera == null || tank == null) return;
