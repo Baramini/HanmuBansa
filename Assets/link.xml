@@ -1,0 +1,7 @@
+<linker>
+  <assembly fullname="Unity.Services.Core" preserve="all"/>
+  <assembly fullname="Unity.Services.Authentication" preserve="all"/>
+  <assembly fullname="Unity.Services.Relay" preserve="all"/>
+  <assembly fullname="Unity.Services.Lobbies" preserve="all"/>
+  <assembly fullname="Unity.Netcode.Runtime" preserve="all"/>
+</linker>

@@ -17,7 +17,9 @@ namespace BrmnModules.Common
         private void Start()
         {
             onSceneInitialized?.Invoke();
+            ApplySavedDisplaySettings();
             if (initialBgmName != "") AudioManager.Instance.PlayBGM(initialBgmName, true);
+
             StartCoroutine(DelayedInitializeCoroutine());
         }
 
@@ -25,6 +27,23 @@ namespace BrmnModules.Common
         {
             yield return new WaitForSeconds(delaySeconds);
             onDelayedInitialized?.Invoke();
+        }
+
+        // -- Internal --
+        private void ApplySavedDisplaySettings()
+        {
+            // Not WebGL/Mobile
+            bool isDesktop = Application.platform == RuntimePlatform.WindowsPlayer
+                        || Application.platform == RuntimePlatform.OSXPlayer
+                        || Application.platform == RuntimePlatform.LinuxPlayer;
+        
+            if (!isDesktop) return;
+        
+            int width = PlayerPrefs.GetInt("ResWidth", 1920);
+            int height = PlayerPrefs.GetInt("ResHeight", 1080);
+            bool fullscreen = PlayerPrefs.GetInt("Fullscreen", 1) == 1;
+        
+            Screen.SetResolution(width, height, fullscreen);
         }
     }
 }

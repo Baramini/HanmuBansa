@@ -448,11 +448,10 @@ public class MatchManager : MonoBehaviour
     
         // WebGL does not support local server sockets → Must go through Relay
         // A problem that arose because I developed the multiplayer mode first and then tried to develop the single-player
-        if (Application.platform == RuntimePlatform.WebGLPlayer) _ = StartSingleplayWithRelayAsync();
+        if (!Application.isEditor) _ = StartSingleplayWithRelayAsync();
         else StartSingleplay();
     }
     
-    // WebGL-only
     private async Task StartSingleplayWithRelayAsync()
     {
         try
@@ -500,7 +499,7 @@ public class MatchManager : MonoBehaviour
         }
     }
     
-    // Not WebGL
+    // Only Editor
     public void StartSingleplay()
     {
         GameMode.SetSingleplay();
@@ -589,16 +588,17 @@ public class MatchManager : MonoBehaviour
     private void SetupTransport()
     {
         var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
-        bool useWebSocket = Application.platform == RuntimePlatform.WebGLPlayer;
+        bool useWebSocket = !Application.isEditor;
         transport.UseWebSockets = useWebSocket;
     }
 
     private Unity.Services.Multiplayer.RelayProtocol GetConnectionType()
     {
         Unity.Services.Multiplayer.RelayProtocol type;
+
+        // To make cross-play possible
         if (Application.isEditor) type = Unity.Services.Multiplayer.RelayProtocol.UDP;
-        else if (Application.platform == RuntimePlatform.WebGLPlayer) type = Unity.Services.Multiplayer.RelayProtocol.WSS;
-        else type = Unity.Services.Multiplayer.RelayProtocol.DTLS;
+        else type = Unity.Services.Multiplayer.RelayProtocol.WSS;
 
         return type;
     }
