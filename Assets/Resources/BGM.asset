@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: BGMData
-  m_EditorClassIdentifier: Assembly-CSharp:BrmnModules.Audio:BGMData
+  m_Script: {fileID: 11500000, guid: d7e2d9e4bd208ca4c89823fcd2bc78f8, type: 3}
+  m_Name: BGM
+  m_EditorClassIdentifier: Assembly-CSharp::BrmnModules.Audio.BGMData
   entries:
   - key: Main
     clip: {fileID: 8300000, guid: 03ed9ea1b657b6640b4cac60db370b45, type: 3}

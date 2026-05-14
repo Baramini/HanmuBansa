@@ -18,7 +18,7 @@ namespace BrmnModules.Audio
 
         private void OnEnable()
         {
-            BuildDict();
+            dict = null;
         }
 
         private void BuildDict()
@@ -35,7 +35,7 @@ namespace BrmnModules.Audio
 
         public AudioClip Get(string key)
         {
-            if (dict == null) BuildDict();
+            if (dict == null || dict.Count == 0) BuildDict();
             return dict.TryGetValue(key, out AudioClip clip) ? clip : null;
         }
 
@@ -45,10 +45,4 @@ namespace BrmnModules.Audio
             return dict.ContainsKey(key);
         }
     }
-
-    [CreateAssetMenu(fileName = "BGMData", menuName = "BrmnModules/Audio/BGMData")]
-    public class BGMData : AudioClipData { }
-
-    [CreateAssetMenu(fileName = "SFXData", menuName = "BrmnModules/Audio/SFXData")]
-    public class SFXData : AudioClipData { }
 }

@@ -4,4 +4,5 @@
   <assembly fullname="Unity.Services.Relay" preserve="all"/>
   <assembly fullname="Unity.Services.Lobbies" preserve="all"/>
   <assembly fullname="Unity.Netcode.Runtime" preserve="all"/>
+  <namespace fullname="BrmnModules.Audio" preserve="all"/>
 </linker>

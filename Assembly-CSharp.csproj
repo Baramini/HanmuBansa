@@ -73,6 +73,7 @@
     <Compile Include="Assets\Project\Scripts\Modules\IMovementInput.cs" />
     <Compile Include="Assets\Project\Scripts\Managers\PlayerRecordManager.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Tank\TankHealth.cs" />
+    <Compile Include="Assets\Project\Scripts\Modules\BGMData.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Item\BoosterItem.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Item\ItemPickup.cs" />
     <Compile Include="Assets\Project\Scripts\UI\Popup UI\StatusMessagePopup.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="Assets\Project\Scripts\UI\Popup UI\GameOverPopup.cs" />
     <Compile Include="Assets\Project\Scripts\UI\TankSlotUI.cs" />
     <Compile Include="Assets\Project\Scripts\GamePlay\Item\ShieldItem.cs" />
+    <Compile Include="Assets\Project\Scripts\Modules\SFXData.cs" />
     <Compile Include="Assets\Project\Scripts\Modules\BaseUI.cs" />
     <Compile Include="Assets\Project\Scripts\Modules\AudioClipData.cs" />
     <Compile Include="Assets\Project\Scripts\Common\TankSpriteContainer.cs" />

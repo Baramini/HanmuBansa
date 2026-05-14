@@ -9,15 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: SFXData
-  m_EditorClassIdentifier: Assembly-CSharp:BrmnModules.Audio:SFXData
+  m_Script: {fileID: 11500000, guid: d66ebbf263b0b824aab4843422a528e8, type: 3}
+  m_Name: SFX
+  m_EditorClassIdentifier: Assembly-CSharp::BrmnModules.Audio.SFXData
   entries:
-  - key: Fire
-    clip: {fileID: 8300000, guid: d7cc8c5ce8b17ae48b72fe28f782abdc, type: 3}
   - key: Explosion
     clip: {fileID: 8300000, guid: 5d0b41d906588e64ea50cb68393cc2fd, type: 3}
-  - key: Warning
-    clip: {fileID: 8300000, guid: 6aeeb14b92383fe40ba7aea8406ca4e2, type: 3}
+  - key: Fire
+    clip: {fileID: 8300000, guid: d7cc8c5ce8b17ae48b72fe28f782abdc, type: 3}
   - key: GetItem
     clip: {fileID: 8300000, guid: 3aa3ab3c3d5f24f4da6be38fa605a5e2, type: 3}
+  - key: Warning
+    clip: {fileID: 8300000, guid: 6aeeb14b92383fe40ba7aea8406ca4e2, type: 3}

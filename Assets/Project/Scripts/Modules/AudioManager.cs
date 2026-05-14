@@ -38,20 +38,23 @@ namespace BrmnModules.Audio
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
+            if (bgmData == null) bgmData = Resources.Load<BGMData>("BGMData");
+            if (sfxData == null) sfxData = Resources.Load<SFXData>("SFXData");
+ 
             if (bgmSource == null)
             {
                 bgmSource = gameObject.AddComponent<AudioSource>();
                 bgmSource.playOnAwake = false;
                 bgmSource.loop = true;
             }
-
+ 
             if (sfxSource == null)
             {
                 sfxSource = gameObject.AddComponent<AudioSource>();
                 sfxSource.playOnAwake = false;
                 sfxSource.loop = false;
             }
-
+ 
             LoadVolumes();
         }
 
