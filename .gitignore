@@ -17,3 +17,20 @@
 # OS
 .DS_Store
 Thumbs.db
+
+# Visual Studio
+*.sln
+*.slnx
+*.csproj
+*.vsconfig
+
+# Unity auto-generated
+*.cs.meta
+Assembly-CSharp*.cs
+ComputeCommandBuffer.cs
+IBaseCommandBuffer.cs
+IComputeCommandBuffer.cs
+IRasterCommandBuffer.cs
+IUnsafeCommandBuffer.cs
+RasterCommandBuffer.cs
+UnsafeCommandBuffer.cs
