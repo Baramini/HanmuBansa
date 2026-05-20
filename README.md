@@ -16,6 +16,17 @@
 | 체력 | 2회 피격 시 게임오버 |
 | 매칭 | 방 만들기 / 코드 참가 / 자동 매칭 |
 
+## ゲームプレイ
+
+| 項目 | 内容 |
+|------|------|
+| 人数 | 2～4人マルチプレイ |
+| マップ | 2種類 (Map_Spaceship_Warehouse / Map_Spaceship_Arena) |
+| 戦車 | 4種類 (外観が異なる、ステータスは同一) |
+| 砲弾 | 無限反射、砲弾同士が衝突すると消滅、自身の砲弾に被弾可能 |
+| 体力 | 2回被弾でゲームオーバー |
+| マッチング | ルーム作成 / コード参加 / 自動マッチング |
+
 ---
 
 ## 기술 스택
@@ -27,5 +38,13 @@
 | 백엔드 | Unity Gaming Services — Relay, Lobby |
 | 플랫폼 | WebGL (wss), exe (wss), Editor (udp) 크로스 플랫폼 |
 | UI | 커스텀 UI 프레임워크 (BrmnModules.UI) |
-| 오디오 | 커스텀 AudioManager (ScriptableObject 기반) |
 
+## 技術スタック
+
+| 分類 | 使用技術 |
+|------|----------|
+| エンジン | Unity 6.3 LTS (6000.3.10f1) |
+| ネットワーク | Unity Netcode for GameObjects (NGO)、Unity Transport (UTP) |
+| バックエンド | Unity Gaming Services — Relay、Lobby |
+| プラットフォーム | WebGL (wss)、exe (wss)、Editor (udp) クロスプラットフォーム |
+| UI | カスタムUIフレームワーク (BrmnModules.UI) |
